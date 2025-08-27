@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSU-COP4610-Operating-Systems</title>
+    <link rel="icon" type="image/x-icon" href="./figure/tux.png"> 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 960px;
+            margin-top: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-top: 20px;
+            color: #0056b3;
+        }
+
+        h3 {
+            margin-left: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul.indented {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        ul li i {
+            margin-right: 10px;
+            color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        th, td {
+            text-align: left;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            vertical-align: middle;
+            margin-right: 8px;
+            color: #28a745;
+        }
+
+        .btn-social {
+            margin-right: 5px;
+        }
+
+        .fa-envelope {
+            color: #c23a2b;
+        }
+
+        .fa-map-marker-alt {
+            color: #006400;
+        }
+
+        @keyframes blink {
+            0%, 100% { color: red; }
+            50% { color: orange; } 
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1><i class="fas fa-laptop-code"></i> COP 4610 Operating Systems - Fall 2025</h1>
+
+        <h2><i class="fas fa-info-circle"></i> Time & Place</h2>
+        <ul class="indented">
+            <li><i class="fas fa-map-marker-alt"></i> <strong>Lecture Room:</strong> HCB (Huge Classroom Building) 0103</li>
+            <li><i class="fas fa-calendar-alt"></i> <strong>Lecture Times:</strong> Monday, Wednesday, 1:20 p.m. - 2:35 p.m.</li>
+            <li><i class="fas fa-map-marker-alt"></i> <strong>Recitation Room:</strong> MCH (Milton Carothers Hall) 0201</li>
+            <li><i class="fas fa-calendar-alt"></i> <strong>Recitation Times:</strong> <span style="color: #ff4500; font-weight: bold; background-color: #f0f0f0; padding: 2px 5px; border-radius: 3px;">Friday, 1:20 p.m. - 2:10 p.m.</span></li>
+        </ul>
+
+        <h2><i class="fas fa-user"></i> Instructor Information</h2>
+        <ul class="indented">
+            <li><i class="fas fa-chalkboard-teacher"></i> <strong>Instructor:</strong> Dr. Xin Liu</li>
+            <li><i class="fas fa-envelope"></i> <strong>Email:</strong> <a href="mailto:xl24j@fsu.edu">xliu15j@fsu.edu</a></li>
+            <li>    
+                <i class="fas fa-clock"></i> 
+                <strong>Office Hours:</strong> <span style="color: #ff4500; font-weight: bold; background-color: #f0f0f0; padding: 2px 5px; border-radius: 3px;">Monday, Wednesday, 4:00 p.m. - 5:00 p.m. </span>
+                <div style="margin-left: 150px;">Available via Zoom (appointment required).
+                </div>
+            </li>
+            <li><i class="fas fa-map-marker-alt"></i> <strong>Office:</strong> James Jay Love Building, 160</li>
+        </ul>
+
+        <h2><i class="fas fa-user-graduate"></i> Teaching Assistants</h2>
+        <ul class="indented">
+            <li><i class="fas fa-user"></i> <strong>Teaching Assistant 1:</strong> TBA </li>
+            <li><i class="fas fa-user"></i> <strong>Teaching Assistant 2:</strong> TBA </li>
+            <li><i class="fas fa-envelope"></i> <strong>Email:</strong> <a href="mailto:mtnguyen@fsu.edu">TBA</a></li>
+            <li> <i class="fas fa-clock"></i>  <strong>Office Hours:</strong> <span style="color: #ff4500; font-weight: bold; background-color: #f0f0f0; padding: 2px 5px; border-radius: 3px;">Tuesday, 1:00 p.m. – 4:00 p.m.</span> and <span style="color: #ff4500; font-weight: bold; background-color: #f0f0f0; padding: 2px 5px; border-radius: 3px;">Friday, 1:00 p.m. – 4:00 p.m.</span></li>
+            <li><i class="fas fa-map-marker-alt"></i> <strong>Office:</strong> James Jay Love Building, Major Lab</li>
+        </ul>
+
+        <h2><i class="fas fa-bullseye"></i> Course Objectives</h2>
+<ul class="indented">
+    <li><i class="fas fa-dot-circle"></i> <strong>Fundamental Understanding of Operating System Concepts:</strong>
+        <ul class="indented">
+            <li><i class="fas fa-check-circle"></i> <strong>Virtualization:</strong> Understand how operating systems virtualize the CPU (processes, scheduling) and memory (address spaces, paging, segmentation, caching, TLBs) to enable secure and concurrent execution.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Concurrency:</strong> Learn thread-based programming, synchronization primitives (locks, semaphores, condition variables), and identify common concurrency bugs such as data races and deadlocks.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Persistence:</strong> Study file systems, I/O management, and reliability techniques for managing disk-based storage.</li>
+        </ul>
+    </li>
+    <li><i class="fas fa-dot-circle"></i> <strong>Low-Level System Programming Proficiency:</strong>
+        <ul class="indented">
+            <li><i class="fas fa-check-circle"></i> <strong>C Programming:</strong> Gain fluency in writing C programs to interact with OS-level APIs and perform low-level memory operations.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>UNIX/Linux System Calls:</strong> Use system calls to create/manage processes, memory, and file descriptors.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Binary Analysis & Reverse Engineering:</strong> Understand ELF binaries, linking/loading, and security vulnerabilities like buffer overflows and return-to-libc attacks.</li>
+        </ul>
+    </li>
+    <li><i class="fas fa-dot-circle"></i> <strong>Practical Application and Problem-Solving:</strong>
+        <ul class="indented">
+            <li><i class="fas fa-check-circle"></i> <strong>Hands-on Implementation:</strong> Complete programming assignments that involve building or modifying operating system components.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Debugging and Troubleshooting:</strong> Identify and resolve issues in system-level code, especially concurrency-related bugs.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Understanding System Internals:</strong> Analyze OS design and its impact on performance and security.</li>
+        </ul>
+    </li>
+    <li><i class="fas fa-dot-circle"></i> <strong>Secondary Course Objectives:</strong>
+        <ul class="indented">
+            <li><i class="fas fa-check-circle"></i> <strong>Hardware-Software Interface:</strong> Explore how OS uses hardware features (e.g., MMU, DMA) for resource management.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Command-Line Tools and Scripting:</strong> Become proficient in shell scripting and using UNIX tools for automation and debugging.</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Security Implications:</strong> Identify OS-level vulnerabilities (e.g., buffer overflows, Meltdown/Spectre).</li>
+            <li><i class="fas fa-check-circle"></i> <strong>Modern OS Context:</strong> Relate OS principles to real-world systems like data centers, HPC platforms, and AI servers.</li>
+        </ul>
+    </li>
+</ul>
+
+
+
+        <h2><i class="fas fa-book-open"></i> Prerequisites</h2>
+        <ul class="indented">      
+            <li><i class="fas fa-microchip"></i> <strong>CDA 3100:</strong> Understanding of computer orgnization.</li>
+            <li><i class="fas fa-code"></i> <strong>COP 4530:</strong> Understanding of data structures.</li>
+        </ul>
+
+        <h2><i class="fas fa-file-alt"></i> Course Material</h2>
+        <ul class="indented">
+            
+            <li><i class="fas fa-book"></i> <strong>Textbook:</strong> Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau, <em><a href="https://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">Operating Systems: Three Easy Pieces</a></em>.</li>
+            <li><i class="fas fa-chalkboard"></i> <strong>Slides and Codes:</strong> Availabl edirectly on this website.</li>
+        </ul>
+
+        <h2><i class="fas fa-desktop"></i> Computer Accounts</h2>
+        <ul class="indented">
+            <li><i class="fab fa-github"></i> You will need a <strong>GitHub account</strong> to access course assignments and use GitHub Codespaces.</li>
+            <li><i class="fas fa-graduation-cap"></i> It is strongly recommended to apply for the <a href="https://education.github.com/pack" target="_blank" rel="noopener">GitHub Student Developer Pack</a> to access free credits for Codespaces and other developer tools.</li>
+            <li><i class="fas fa-envelope"></i> You will need a <strong>my.fsu.edu</strong> account for receiving class emails. For more information, visit: 
+                <a href="https://servicecenter.fsu.edu/s/article/Email-Account-Management-Information2" target="_blank">https://servicecenter.fsu.edu/s/article/Email-Account-Management-Information2</a>.
+            </li>
+        </ul>
+
+
+        <h2><i class="fas fa-tasks"></i> Your Responsibilities</h2>
+        <ul class="indented">
+            <li><i class="fas fa-globe"></i> Check the course website and your email account regularly.</li>
+            <li><i class="fas fa-book-reader"></i> Understand the lecture slides and reading assignments.</li>
+            <li><i class="fas fa-shield-alt"></i> Uphold academic honesty in completing your assignments, projects, and exams.</li>
+            <li><i class="fas fa-clock"></i> Turn in your projects on time.</li>
+            <li><i class="fas fa-user-friends"></i> Attend office hours for extra help, as needed.</li>
+        </ul>
+
+
+
+        <h2><i class="fas fa-calendar-alt"></i> Course Calendar (Tentative)</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 2%;">Week</th>
+                    <th style="text-align: center; width: 2%;">Date</th>
+                    <th style="text-align: center; width: 60%;">Topic</th>
+                    <th style="text-align: center; width: 36%;">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">1</td>
+                    <td style="text-align: center; vertical-align: middle;">8/25</br>(M)</td>
+                    <td style="vertical-align: middle;">Course Syllabus <a href="syllabus_cop4610.pdf" target="_blank">[PDF]</a> 
+                        </br>L1: Preparation for Learning OS <a href="l1_preparation.pdf" target="_blank" rel="noopener">[PDF]</a></br>( Linux, VS Code, GitHub, JSON, and AI)</a> 
+                    </td>
+                    <td>Mandatory first-day attendance.</br><span style="color: red; font-weight: bold;">No-shows will be dropped.</span></br>HW 1 Posted on GH CL.</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">8/27</br>(W)</br></td>
+                    <td style="vertical-align: middle;">L2: Hello, OS World! <a href="l2_statemachine.pdf" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(Viewing Operating Systems from Multiple Angles)</td>
+                    <td></td>
+                </tr>
+ 
+
+                <!-- ======================================================
+                ===============  IMPORTANT SECTION  ==================
+                ====================================================== -->
+
+                <tr>
+                    <td colspan="4" style="text-align: center;"><strong>Interfacing</strong></td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">2</td>
+                    <td style="text-align: center; vertical-align: middle;">9/1</br>(M)</td>
+                    <td style="vertical-align: middle;">No class due to Labor Day.</td>
+                    <td></td>
+                </td>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">9/3</br>(W)</td>
+                    <td style="vertical-align: middle;">L3: Accessing Operating System Objects <a href="l3_shell.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(UNIX Shell, Terminal, Shell Code)
+                    </td>
+                    <td>HW 1 DDL at 23:59 PM (ET)</br>Proj 1 Posted on GH Classroom</td>
+                </tr>
+
+                <!-- ======================================================
+                ===============  IMPORTANT SECTION  ==================
+                ====================================================== -->
+
+                <tr>
+                    <td colspan="4" style="text-align: center;"><strong>Virtualization</strong></td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">3</td>
+                    <td style="text-align: center; vertical-align: middle;">9/8</br>(M)</td>
+                    <td style="vertical-align: middle;">L4: Programs and Processes <a href="l4_process.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(Firmware, First Process, Fork, Execve)</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">9/10</br>(W)</td>
+                    <td style="vertical-align: middle;">L5: Process Address Space <a href="l5_adress_space.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(mmap, Game Cheat)</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">4</td>
+                    <td style="text-align: center; vertical-align: middle;">9/15</br>(M)</td>
+                    <td style="vertical-align: middle;">L6: Address Translation <a href="l6_address_translation.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(Segmentation, Paging)</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">9/17</br>(W)</td>
+                    <td style="vertical-align: middle;">L7: Caching <a href="l7_caching.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a><br>(Cache Hit/Miss, TLB, Meltdown and Spectre Attack)</td>
+                    <td>HW 2 Posted on Canvas</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">5</td>
+                    <td style="text-align: center; vertical-align: middle;">9/22</br>(M)</td>
+                    <td style="vertical-align: middle;">L8: Stack <a href="l8_stack.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(Stack Layout, Offset Calculation, Buffer Overflow) </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">9/24</br>(W)</td>
+                    <td style="vertical-align: middle;">L9: libc <a href="l9_libc.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(glibc, ret2libc) </td>
+                    <td>HW 2 DDL at 23:59 PM (ET)</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">6</td>
+                    <td style="text-align: center; vertical-align: middle;">9/29</br>(M)</td>
+                    <td>L10: elf <a href="l10_elf.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank">[Code]</a></br>(From ELF to EXE and Beyond)</td>
+                    <td>Proj 1 DDL at 23:59 PM (ET)</br>Proj 2 Posted on GH Classroom</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">10/1</br>(W)</td>
+                    <td>L11: linking and loading <a href="l11_linking_loading.PDF" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank">[Code]</a></br>(Dynamic Linking, GOT, PLT)</td>
+                    <td>HW 3 Posted on GH Classroom</td>
+                </tr>       
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">7</td>
+                    <td style="text-align: center; vertical-align: middle;">10/6</br>(M)</td>
+                    <td>TBD</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">10/8</br>(W)</td>
+                    <td>Midterm Exam Review </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">8</td>
+                    <td style="text-align: center; vertical-align: middle;">10/13</br>(M)</td>
+                    <td>TBD</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">10/15</br>(W)</td>
+                    <td><span style="color: red; font-weight: bold;">Midterm Exam (1:00 p.m. – 2:30 p.m)</span></td>
+                    <td>HW 3 DDL at 23:59 PM (ET)</td>
+                </tr>
+
+                <tr><td colspan="4" style="text-align: center;"><strong>Concurrency</strong></td></tr>
+
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">9</td>
+                    <td style="text-align: center; vertical-align: middle;">10/20</br>(M)</td>
+                    <td>L14: Concurrent Programming </br>(Thread)</td>
+                    <td>Proj 2 DDL at 23:59 PM (ET)</br>Proj 3 Posted on GH Classroom</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">10/22</br>(W)</td>
+                    <td>L15: CPU Scheduling <a href="lecture_14_virtual_memory.pptx" target="_blank">[PPT]</a></td>
+                    <td>HW 4 Posted on Canvas</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">10</td>
+                    <td style="text-align: center; vertical-align: middle;">10/27</br>(M)</td>
+                    <td>L16: More on Mutual Exclusion<a href="lecture_15_program_execution_in_memory.PDF" target="_blank">[PDF]</a></br></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">10/29</br>(W)</td>
+                    <td>L17: Mutual Exclusion<a href="lecture_16_io_device.PDF" target="_blank">[PDF]</a><br>()</td>
+                    <td>HW 4 DDL at 23:59 PM (ET)</br>HW 5 Posted on GH Classroom</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">11</td>
+                    <td style="text-align: center; vertical-align: middle;">11/3</br>(M)</td>
+                    <td>L18: Synchronization<a href="lecture_17_driver.PDF" target="_blank">[PDF]</a><a href="https://github.com/xinliulab/COP4610_Operating_Systems/tree/main/Lecture_17_IO_Device_Driver" target="_blank" rel="noopener">[Code]</a><br>()</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">11/5</br>(W)</td>
+                    <td>L19: More on Synchronization<a href="lecture_18_storage_device.PDF" target="_blank">[PDF]</a><br>()</td>
+                    <td>HW 5 DDL at 23:59 PM (ET)</br>HW 6 Posted on GH Classroom</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">12</td>
+                    <td style="text-align: center; vertical-align: middle;">11/10</br>(M)</td>
+                    <td>L20: Real World Concurrent Programming</br>(Web, HPC, Data Center, AI)</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">11/12</br>(W)</td>
+                    <td>L21: Bug and Debugging <a href="lecture_19_api.PDF" target="_blank">[PDF]</a><br>(Deadlocks, Data Races, Atomicity/Ordering Violations)</td>
+                    <td>HW 6 DDL at 23:59 PM (ET)</br>HW 7 Posted on Canvas</td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center;"><strong>Persistence</strong></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">13</td>
+                    <td style="text-align: center; vertical-align: middle;">11/17</br>(M)</td>
+                    <td>L22: Stroage <a href="lecture_22_loader.PDF" target="_blank">[PDF]</a></br>()</td>
+                    <td>Proj 3 DDL at 23:59 PM (ET)</br>Proj 4 Posted on GH Classroom</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">11/19</br>(W)</td>
+                    <td>L23: File System <a href="final_assignment.PDF" target="_blank">[PDF]</a></td>
+                    <td>HW 7 DDL at 23:59 PM (ET)</br>HW 8 Posted on Canvas</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">14</td>
+                    <td style="text-align: center; vertical-align: middle;">11/24</br>(M)</td>
+                    <td>L24: I/O <a href="lecture_20_raid.PDF" target="_blank">[PDF]</a><br>(RAID, Crash, FSCK, Journaling, Distributed Storage)</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">11/26</br>(W)</td>
+                    <td>No class Due to Thanksgiving.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">15</td>
+                    <td style="text-align: center; vertical-align: middle;">12/1</br>(M)</td>
+                    <td>L25: Driver <a href="lecture_21_network.pptx" target="_blank">[PPT]</a></br>()</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">12/3</br>(W)</td>
+                    <td>Final Exam Review</td>
+                    <td>HW 8 DDL at 23:59 PM (ET)</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="text-align: center; vertical-align: middle;">16</td>
+                    <td style="text-align: center; vertical-align: middle;">12/9</br>(M)</td>
+                    <td>No Class Due to Final Examination Week.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">12/10</br>(W)</td>
+                    <td>
+                        <span style="color: red; font-weight: bold;">Final Exam (12:30 p.m. – 2:30 p.m)</span><br>
+                        <span style="color: red; font-weight: bold; animation: blink 1s infinite;">
+                        
+                        <span style="font-size: larger;">NO MAKE-UPs</span>
+                        </span>
+                    </td>
+                    <td>Proj 4 DDL at 23:59 PM (ET)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><i class="fas fa-graduation-cap"></i> Grading Policy</h2>
+        <ul class="indented">
+            <li><i class="fas fa-pencil-alt"></i> <strong>In-Class Quizzes:</strong> 10%</li>
+            <li><i class="fas fa-pencil-alt"></i> <strong>HW Assignments:</strong> 25%</li>
+            <li><i class="fas fa-clipboard-list"></i> <strong>Exams (2 total):</strong> 30%</li>
+            <li><i class="fas fa-project-diagram"></i> <strong>Projects (3 total):</strong> 35%</li>
+        </ul>
+
+
+        <ul style="margin-left: 50px; list-style-type: disc;">
+            <li>Assignments consist of short-answer questions, essays, or problems. The purpose of these assignments is to prepare you for exams.</li>
+            <li>On exams, 80% of the questions asked will be based on lecture materials, assignments, and projects; 20% of the questions will test your ability to apply various principles learned in the class.</li>
+            <li>The midterm exam will cover the course content related to process management, while the final exam will cover memory, file and network management.</li>
+            <li>There will be three increasingly challenging projects due during this course. You are expected to work in teams of two to three people. For both HW and projects, if you receive help from others, or if you find helpful information from various sources, please include appropriate acknowledgements.</li>
+        </ul>
+
+
+        <h2><i class="fas fa-gavel"></i> Course Policies</h2>
+
+        <h3><i class="fas fa-exclamation-circle"></i> Missed Exam Policy</h3>
+        <p style="margin-left: 25px;">Unexcused missed exams and HW will be given a grade of 0. See the University Attendance Policy for a discussion of valid reasons to excuse absences (<a href="https://registrar.fsu.edu/bulletin/graduate/information/academic_regulations/" target="_blank">https://registrar.fsu.edu/bulletin/graduate/information/academic_regulations/</a>).</p>
+
+        <h3><i class="fas fa-info-circle"></i> Grade of “I” Policy</h3>
+        <p style="margin-left: 25px;">Incomplete (“I”) grades should be recorded only in exceptional cases when a student, who has completed a substantial portion of the course and who is otherwise passing, is unable to complete a well-defined portion of a course for reasons beyond the student’s control. Students in these circumstances must petition the instructor and should be prepared to present documentation that substantiates their case.</p>
+
+
+        <h3><i class="fas fa-user-check"></i> University Attendance Policy</h3>
+        <p style="margin-left: 25px;">Excused absences include documented illness, deaths in the family and other documented crises, call to active military duty or jury duty, religious holy days, and official University activities. These absences will be accommodated in a way that does not arbitrarily penalize students who have a valid excuse. Consideration will also be given to students whose dependent children experience serious illness.</p>
+
+        <h3><i class="fas fa-balance-scale"></i> Academic Honor Policy</h3>
+        <p style="margin-left: 25px;">The Florida State University Academic Honor Policy outlines the University's expectations for the integrity of students' academic work, the procedures for resolving alleged violations of those expectations, and the rights and responsibilities of students and faculty members throughout the process. Students are responsible for reading the Academic Honor Policy and for living up to their pledge to "...be honest and truthful and...[to] strive for personal and institutional integrity at Florida State University." (Florida State University Academic Honor Policy, found at <a href="http://fda.fsu.edu/Academics/Academic-Honor-Policy" target="_blank" rel="noopener">http://fda.fsu.edu/Academics/Academic-Honor-Policy</a>).
+        <p>
+        <p style="margin-left: 25px;">For this course, in particular, every student must complete his/her assignments, quizzes, and exams independently. Showing your work to your peers or making it accessible to them is considered academic dishonesty. You are responsible for ensuring that your work is adequately protected and not accessible to others.
+        </p>
+
+
+        <h3><i class="fas fa-universal-access"></i> Americans with Disabilities Act</h3>
+        <p style="margin-left: 25px;">Students with disabilities needing academic accommodation should: 
+            <ol>
+                <li>Register with and provide documentation to the Student Disability Resource Center (SDRC).</li>
+                <li>Bring a letter to the instructor indicating the need for accommodation and the specific type required.</li>
+            </ol>
+        </p>
+        <p style="margin-left: 25px;">Please note that instructors cannot provide classroom accommodations until appropriate verification from the SDRC has been received. This syllabus and other class materials are available in alternative formats upon request. 
+        </p>
+        <p style="margin-left: 25px;">For more information about services available to FSU students with disabilities, please contact the SDRC:
+            <br><strong>Address:</strong> 874 Traditions Way, 108 Student Services Building, Florida State University, Tallahassee, FL 32306-4167
+            <br><strong>Phone:</strong> (850) 644-9566 (voice), (850) 644-8504 (TDD)
+            <br><strong>Email:</strong> <a href="mailto:sdrc@admin.fsu.edu">sdrc@admin.fsu.edu</a>
+            <br><strong>Website:</strong> <a href="http://www.disabilitycenter.fsu.edu" target="_blank" rel="noopener">http://www.disabilitycenter.fsu.edu</a>
+        </p>
+
+        <h3><i class="fas fa-heartbeat"></i> Confidential Campus Resources</h3>
+        <p style="margin-left: 25px;">Various centers and programs are available to assist students with navigating stressors that might impact academic success. These include the following:</p>
+        <ul style="margin-left: 50px;">
+            <li><strong>Victim Advocate Program:</strong> University Center A, Room 4100, (850) 644-7161, Available 24/7/365, Office Hours: M-F 8-5, <a href="https://dsst.fsu.edu/vap" target="_blank" rel="noopener">https://dsst.fsu.edu/vap</a></li>
+            <li><strong>University Counseling Center:</strong> Askew Student Life Center, 2nd Floor, 942 Learning Way. (850) 644-8255, <a href="https://counseling.fsu.edu/" target="_blank" rel="noopener">https://counseling.fsu.edu/</a></li>
+            <li><strong>University Health Services:</strong> Health and Wellness Center, (850) 644-6230, <a href="https://uhs.fsu.edu/" target="_blank" rel="noopener">https://uhs.fsu.edu/</a></li>
+        </ul>
+
+        <h3><i class="fas fa-graduation-cap"></i> Free Tutoring from FSU</h3>
+        <p style="margin-left: 25px;">On-campus tutoring and writing assistance is available for many courses at Florida State University. For more information, visit the Academic Center for Excellence (ACE) Tutoring Services’ comprehensive list of on-campus tutoring options at <a href="http://ace.fsu.edu/tutoring" target="_blank" rel="noopener">http://ace.fsu.edu/tutoring</a> or contact <a href="mailto:tutor@fsu.edu">tutor@fsu.edu</a>. High-quality tutoring is available by appointment and on a walk-in basis. These services are offered by tutors trained to encourage the highest level of individual academic success while upholding personal academic integrity.</p>
+
+        <h3><i class="fas fa-hourglass-half"></i> Late Policy and Make-up Exams</h3>
+        <ul style="margin-left: 50px; list-style-type: disc;">
+            <li>Late assignments will not ordinarily be accepted. If, for some compelling reason, you cannot hand in an assignment on time, please contact the instructor as far in advance as possible.</li>
+            <li>No credit will be given to late course projects.</li>
+            <li>No make-up exams (except under extremely unusual circumstances).</li>
+        </ul>
+
+
+        <h3><i class="fas fa-exclamation-circle"></i> Syllabus Change Policy</h3>
+        <p style="margin-left: 25px;">Except for changes that substantially affect the implementation of the evaluation (grading) statement, this syllabus is a guide for the course and is subject to change with advance notice.</p>
+    </div>
+
+</body>
+</html>
