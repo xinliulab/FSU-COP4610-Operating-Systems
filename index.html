@@ -93,6 +93,57 @@
     </style>
 </head>
 
+<dialog id="videoDialog">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #ddd;">
+    <strong>Lecture 6 Demo</strong>
+    <button onclick="closeVideo()" style="font-size:16px;">✕</button>
+  </div>
+  <video id="player" controls style="width:100%;height:auto;display:block;"></video>
+</dialog>
+
+<style>
+  /* 右侧抽屉式对话框 */
+  #videoDialog {
+    inset: 0 0 0 auto;          /* 贴右侧 */
+    width: min(720px, 90vw);
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: none;
+    overflow: hidden;
+  }
+  #videoDialog::backdrop { background: rgba(0,0,0,0.35); }
+</style>
+
+<script>
+  const dlg = document.getElementById('videoDialog');
+  const vid = document.getElementById('player');
+
+  function openVideo(src) {
+    vid.src = src;          // 同文件夹直接用文件名
+    dlg.showModal();        // 打开对话框
+    vid.play().catch(()=>{}); // 自动播放失败也无碍
+  }
+
+  function closeVideo() {
+    vid.pause();
+    vid.removeAttribute('src'); // 释放资源
+    vid.load();
+    dlg.close();
+  }
+
+  // 点击遮罩关闭
+  dlg.addEventListener('click', (e) => {
+    const rect = dlg.getBoundingClientRect();
+    const inPanel = e.clientX >= rect.left && e.clientX <= rect.right &&
+                    e.clientY >= rect.top  && e.clientY <= rect.bottom;
+    if (!inPanel) closeVideo();
+  });
+
+  // ESC 关闭时也暂停
+  dlg.addEventListener('close', closeVideo);
+</script>
+
 <body>
 
     <div class="container">
@@ -269,7 +320,7 @@
                 <tr>
                     <td rowspan="2" style="text-align: center; vertical-align: middle;">4</td>
                     <td style="text-align: center; vertical-align: middle;">9/15</br>(M)</td>
-                    <td style="vertical-align: middle;">L6: Process' Address Space <a href="l6_space.pdf" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a></br>(Initial State, Management, and Hacking)</td>
+                    <td style="vertical-align: middle;">L6: Process' Address Space <a href="l6_space.pdf" target="_blank">[PDF]</a><a href="https://github.com/FSU-COP4610-F25/in-class-code" target="_blank" rel="noopener">[Code]</a><a href="#" onclick="openVideo('l6_demo.mp4'); return false;">[Demo]</a></br>(Initial State, Management, and Hacking)</td>
                     <td></td>
                 </tr>
                 <tr>
