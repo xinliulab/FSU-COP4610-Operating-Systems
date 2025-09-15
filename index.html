@@ -120,19 +120,19 @@
   const vid = document.getElementById('player');
 
   function openVideo(src) {
-    vid.src = src;          // 同文件夹直接用文件名
-    dlg.showModal();        // 打开对话框
-    vid.play().catch(()=>{}); // 自动播放失败也无碍
+    vid.src = src;         
+    dlg.showModal();        
+    vid.play().catch(()=>{}); 
   }
 
   function closeVideo() {
     vid.pause();
-    vid.removeAttribute('src'); // 释放资源
+    vid.removeAttribute('src'); 
     vid.load();
     dlg.close();
   }
 
-  // 点击遮罩关闭
+
   dlg.addEventListener('click', (e) => {
     const rect = dlg.getBoundingClientRect();
     const inPanel = e.clientX >= rect.left && e.clientX <= rect.right &&
@@ -140,7 +140,7 @@
     if (!inPanel) closeVideo();
   });
 
-  // ESC 关闭时也暂停
+
   dlg.addEventListener('close', closeVideo);
 </script>
 
