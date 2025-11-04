@@ -16,7 +16,7 @@ For the current semester’s syllabus, schedule, and links to slides and code, s
   <http://ostep.org>
 
 - **Inspiration and open courseware**: Prof. **Yanyan Jiang** (Nanjing University). His excellent online OS course and publicly shared code examples greatly influenced the design of our in-class demos and the way we present state-machine thinking in OS education.  
-  Instructor page: <https://ics.nju.edu.cn/~jyy/>; USENIX ATC “The Hitchhiker’s Guide to Operating Systems.” 
+  Instructor page: <https://ics.nju.edu.cn/~jyy/>; USENIX ATC “The Hitchhiker’s Guide to Operating Systems” <https://www.usenix.org/conference/atc23/presentation/jiang-yanyan>
 
 ## Intended audience
 - FSU students enrolled in COP 4610.
