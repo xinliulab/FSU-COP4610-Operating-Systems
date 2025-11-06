@@ -1,5 +1,29 @@
 # FSU COP4610 — Operating Systems (Course Repository)
 
+<p align="center">
+  <a href="https://codespaces.new/FSU-COP4610-F25/in-class-code?ref=main"
+     style="
+       display:inline-block;
+       padding:20px 32px;
+       font-size:26px;
+       font-weight:800;
+       background:#2ea043;
+       color:#ffffff;
+       text-decoration:none;
+       border-radius:16px;
+       box-shadow:0 6px 16px rgba(0,0,0,0.18);
+     ">
+    👉 Click here to open Codespaces
+  </a>
+</p>
+
+<p align="center">
+  <sub>If the button does not open, sign in to GitHub first.</sub>
+</p>
+
+
+
+
 This repository hosts teaching materials for **COP 4610: Operating Systems** at Florida State University. It is used to share lecture slides, demo code, and project scaffolding so students can practice real system-level programming in C and Linux. The course covers virtualization, concurrency, and persistence, and connects OS concepts to real systems like data centers, HPC, and AI platforms.
 
 ## What’s inside
