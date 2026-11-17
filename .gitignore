@@ -2,3 +2,4 @@
 *.txt
 *.o
 .DS_Store
+.canvas_token
