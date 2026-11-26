@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en" data-mode="audience">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COP 4610 Lecture 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04070d; --ink:#eef2f7; --ink2:#c3ccd8; --mute:#b3bdcb; --dim:#8592a6; --rule:#1d2938;
+  --teal:#3fe0c5; --teal-d:#1f9e8b; --gold:#e8bd62; --gold-d:#a8853e; --panel:#0c1420; --red:#ff6b6b;
+  --sans:"Bahnschrift","Barlow","DIN Alternate","DIN Next","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono","JetBrains Mono",Consolas,monospace;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;margin:-540px 0 0 -960px;background:var(--bg);overflow:hidden;transform-origin:50% 50%}
+
+/* ---------- scenes and builds ---------- */
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transform:scale(1.012);filter:blur(4px);
+  transition:opacity .9s var(--ease),transform 1.4s var(--ease),filter .9s var(--ease),visibility 0s linear .9s}
+.scene.active{opacity:1;visibility:visible;transform:none;filter:none;transition:opacity .9s var(--ease),transform 1.4s var(--ease),filter .9s var(--ease),visibility 0s}
+.abs{position:absolute}
+[data-b]{opacity:0;transform:translateY(22px);filter:blur(7px);
+  transition:opacity .5s var(--ease),transform .6s var(--ease),filter .5s var(--ease)}
+[data-b].on{opacity:1;transform:none;filter:none;
+  transition:opacity 1s var(--ease) var(--d,0s),transform 1.2s var(--ease) var(--d,0s),filter 1s var(--ease) var(--d,0s)}
+[data-b].on.past{opacity:.38}
+svg [data-b]{transform:translateY(10px)}
+svg [data-b].on{transform:none}
+.static *{transition:none!important;animation:none!important}
+
+/* ---------- type ---------- */
+.eyebrow{font-size:24px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.eyebrow.on{animation:track 1.6s var(--ease) both}
+@keyframes track{from{letter-spacing:.5em}to{letter-spacing:.22em}}
+.h1{font-size:104px;line-height:1.02;font-weight:600;letter-spacing:-.012em;margin:0;text-wrap:balance}
+.h2{font-size:68px;line-height:1.06;font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.h3{font-size:44px;line-height:1.15;font-weight:500;margin:0;text-wrap:balance}
+.lead{font-size:34px;line-height:1.36;font-weight:400;color:var(--ink2);text-wrap:pretty}
+.body{font-size:30px;line-height:1.42;color:var(--ink2);text-wrap:pretty}
+.small{font-size:23px;line-height:1.42;color:var(--mute);text-wrap:pretty}
+.label{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.cap{font-size:17px;letter-spacing:.04em;color:var(--dim)}
+.gold{color:var(--gold)} .teal{color:var(--teal)} .mute{color:var(--mute)} .white{color:#fff}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.mono{font-family:var(--mono)}
+.glow{text-shadow:0 0 38px rgba(232,189,98,.35)}
+b,strong{color:#fff;font-weight:600}
+code{font-family:var(--mono);font-size:.9em;color:var(--teal)}
+
+/* ---------- layout pieces ---------- */
+.top{left:120px;top:96px;width:1680px}
+.top .h2{margin-top:18px}
+.panel{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.085);border-radius:16px;padding:30px 34px}
+.panel .label{color:var(--gold);margin-bottom:14px}
+.list div{font-size:30px;line-height:1.38;color:var(--ink2);margin:0 0 16px 34px;position:relative;text-wrap:pretty}
+.list div::before{content:"";position:absolute;left:-30px;top:16px;width:9px;height:9px;background:var(--gold);transform:rotate(45deg)}
+.list.small-l div{font-size:26px}
+.term{font-family:var(--mono);background:#060b13;border:1px solid var(--rule);border-radius:12px;padding:22px 26px;font-size:24px;line-height:1.45;color:var(--ink2);white-space:pre;overflow:hidden}
+.term .pr{color:var(--teal)}
+.term .out{color:#fff}
+.hair{height:1px;background:var(--rule)}
+.grid2{display:grid;grid-template-columns:240px 1fr;column-gap:30px}
+.grid2>div{padding:18px 0;border-top:1px solid var(--rule)}
+.grid2 .k{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding-top:26px}
+.grid2 .v{font-size:28px;line-height:1.4;color:var(--ink2)}
+.pct{display:grid;grid-template-columns:1fr auto;row-gap:18px;font-size:30px;color:var(--ink2)}
+.pct .n{color:#fff;font-weight:600;text-align:right}
+.tbd{color:var(--red);border:1px dashed var(--red);border-radius:10px;padding:14px 20px;font-size:24px;line-height:1.35}
+.credit{font-size:17px;letter-spacing:.03em;color:var(--dim)}
+.credit a{color:var(--mute);text-decoration:none}
+a{color:var(--teal);text-decoration:none}
+
+/* ---------- photos ---------- */
+.photo{position:absolute;overflow:hidden;background:#0a1018;border-radius:10px}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.35) brightness(.62) contrast(1.15)}
+.photo.doc img{filter:invert(1) grayscale(1) sepia(.3) hue-rotate(128deg) saturate(1.3) brightness(.85) contrast(1.1)}
+.photo.dim img{filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.35) brightness(.42) contrast(1.35)}
+.photo::after{content:"";position:absolute;inset:0;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.pcap{position:absolute;font-size:18px;line-height:1.35;color:var(--mute);letter-spacing:.02em}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;left:0;right:0;bottom:0;height:56px;pointer-events:none;z-index:5}
+#hud .l{position:absolute;left:120px;bottom:24px;font-size:15px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+#hud .r{position:absolute;right:108px;bottom:14px;font-size:22px;font-weight:600;letter-spacing:.1em;color:var(--ink2);pointer-events:auto;cursor:pointer;padding:6px 14px;border:1px solid rgba(195,204,216,.35);border-radius:8px;background:rgba(10,16,26,.6)}
+#hud .r:hover{color:#fff;border-color:var(--gold)}
+#hud .r::before{content:"\2630  ";color:var(--gold);font-weight:400}
+#prog{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--teal-d),var(--gold));width:0;transition:width 1s var(--ease);opacity:.7}
+
+/* ---------- notes, contents, jump ---------- */
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;background:rgba(6,10,16,.97);border-top:1px solid #223;padding:18px 28px 22px;font:18px/1.55 var(--sans);color:#d7dee8;display:none;z-index:20}
+.rehearse #viewport{bottom:36vh}
+.rehearse #notes{display:block;height:36vh;max-height:none;font-size:25px;line-height:1.5;padding:20px 40px 26px}
+#notes .meta{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#7c8899;margin-bottom:10px;display:flex;gap:28px}
+#notes .meta b{color:var(--gold);font-weight:600}
+#nRow{display:block}
+#nZh{display:none}
+.rehearse #nRow{display:flex;gap:40px;align-items:flex-start}
+.rehearse #nBody{flex:1.15;min-width:0;white-space:pre-line}
+.rehearse #nZh{display:block;flex:1;min-width:0;font-size:21px;line-height:1.65;color:#b4c2d2;border-left:1px solid #26303d;padding-left:32px}
+.rehearse #nZh b{color:var(--gold);font-weight:600}
+.rehearse.nozh #nZh{display:none}
+aside.notes,aside.notes-zh{display:none}
+#overview{position:fixed;inset:0;background:#04070d;z-index:30;display:none;padding:clamp(18px,3vw,56px) clamp(16px,4vw,80px);overflow:auto;font-family:var(--sans)}
+#overview.show{display:block}
+.ovHead{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 28px;margin-bottom:clamp(18px,2.4vw,40px)}
+.ovT{font-weight:600;font-size:clamp(22px,2vw,36px);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.ovHint{font-size:clamp(13px,.95vw,17px);letter-spacing:.03em;color:var(--mute)}
+#ovGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:clamp(20px,2.4vw,44px)}
+.ovCol h4{margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid rgba(232,189,98,.4);cursor:pointer;font-weight:600;font-size:clamp(19px,1.5vw,28px);color:#fff}
+.ovCol h4:hover{color:var(--teal)}
+.ovCol ol{list-style:none;margin:0;padding:0}
+.ovCol li{display:flex;gap:12px;font-size:clamp(16px,1.08vw,21px);line-height:1.35;color:#c9d2de;padding:7px 8px;border-radius:8px;cursor:pointer}
+.ovCol li .p{flex:none;width:2.2em;color:var(--mute);font-variant-numeric:tabular-nums}
+.ovCol li:hover{color:#fff;background:rgba(63,224,197,.1)}
+.ovCol li.cur,.ovCol li.cur .p{color:var(--gold)}
+.ovCol li.cur{background:rgba(232,189,98,.14);font-weight:600}
+#jumpBox,#sizeBox{position:fixed;left:50%;top:5vh;transform:translateX(-50%);z-index:40;padding:.8vw 1.8vw;background:rgba(4,7,13,.94);border:1px solid rgba(232,189,98,.55);color:#fff;font:600 1.6vw var(--sans);letter-spacing:.06em;display:none;white-space:nowrap}
+#jumpBox.show,#sizeBox.show{display:block}
+#help{position:fixed;right:16px;top:12px;font:12px var(--sans);letter-spacing:.12em;color:#8592a6;z-index:10;user-select:none;transition:opacity 1s}
+
+/* ---------- title: live system-call flow ---------- */
+#flow text{font-family:var(--sans)}
+#flow .box{fill:rgba(255,255,255,.03);stroke:rgba(255,255,255,.12);stroke-width:1}
+#flow .band{fill:rgba(232,189,98,.05);stroke:rgba(232,189,98,.45);stroke-width:1}
+#flow .guide{stroke:#1d2938;stroke-width:1}
+#flow .lbl{font-size:26px;fill:#eef2f7;font-weight:500}
+#flow .hw{font-size:22px;fill:#8793a5;letter-spacing:.06em}
+#flow .tag{font-size:16px;fill:#4a5567;letter-spacing:.22em}
+#flow .sys{font-family:var(--mono);font-size:19px;fill:#3fe0c5}
+#flow .irq{font-size:15px;fill:#e8bd62;letter-spacing:.12em}
+
+/* ---------- token speed ---------- */
+.bar{height:14px;border-radius:7px;background:#0f1724;overflow:hidden;border:1px solid var(--rule)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal-d),var(--teal))}
+.bar.g i{background:linear-gradient(90deg,var(--gold-d),var(--gold))}
+
+/* ---------- agent trace ---------- */
+.stack{display:flex;flex-direction:column;gap:14px}
+.layer{border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.022);border-radius:14px;padding:16px 24px;transition:border-color .6s var(--ease),background .6s var(--ease)}
+.layer .ln{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);transition:color .6s}
+.layer .lv{font-size:26px;color:var(--ink2);margin-top:6px;font-family:var(--mono);min-height:34px}
+.layer.lit{border-color:rgba(63,224,197,.55);background:rgba(63,224,197,.06)}
+.layer.lit .ln{color:var(--teal)}
+.layer.os{border-color:rgba(232,189,98,.35)}
+.layer.os.lit{border-color:rgba(232,189,98,.8);background:rgba(232,189,98,.07)}
+.layer.os.lit .ln{color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.chip{font-family:var(--mono);font-size:22px;padding:4px 12px;border:1px solid #2b3a4d;border-radius:6px;color:#4a5567;transition:all .5s var(--ease)}
+.chip.lit{color:#fff;border-color:var(--gold);box-shadow:0 0 16px rgba(232,189,98,.35)}
+.chip.done{color:var(--ink2);border-color:#3a4a60}
+.steps .st{display:grid;grid-template-columns:56px 1fr;column-gap:10px;margin-bottom:18px}
+.steps .n{font-size:22px;color:var(--gold);font-weight:600;padding-top:5px;font-variant-numeric:tabular-nums}
+.steps .t{font-size:27px;line-height:1.35;color:var(--ink2)}
+.steps .lec{font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+
+/* ---------- logisim and pipe ---------- */
+#lgSvg text{font-family:var(--sans)}
+.seg{fill:#111a27;transition:fill .25s}
+.seg.on{fill:var(--gold);filter:drop-shadow(0 0 10px rgba(232,189,98,.55))}
+.bitbox{fill:rgba(255,255,255,.03);stroke:#2b3a4d}
+.bitbox.flash{stroke:var(--teal)}
+.ascii{font-family:var(--mono);font-size:21px;line-height:1.08;white-space:pre}
+.ascii .on{color:var(--red)}
+.ascii .off{color:#2a3442}
+
+/* ---------- software state machine ---------- */
+.code{font-family:var(--mono);font-size:30px;line-height:1.7;background:#060b13;border:1px solid var(--rule);border-radius:12px;padding:20px 26px 20px 20px}
+.code .row{display:grid;grid-template-columns:44px 40px 1fr;align-items:center;border-radius:6px;transition:background .4s}
+.code .row .ln{color:var(--dim);font-size:22px;text-align:right;padding-right:10px}
+.code .row .pc{color:var(--gold);opacity:0;transition:opacity .3s}
+.code .row.cur{background:rgba(232,189,98,.08)}
+.code .row.cur .pc{opacity:1}
+.code .kw{color:#c792ea} .code .ty{color:#82aaff} .code .st{color:#c3e88d} .code .nm{color:#f78c6c}
+.state{display:grid;grid-template-columns:auto 1fr;column-gap:30px;row-gap:12px;font-size:28px}
+.state .k{color:var(--mute);font-family:var(--mono)}
+.state .v{color:#fff;font-family:var(--mono)}
+.state .v.chg{color:var(--teal)}
+
+/* ---------- three bands ---------- */
+.bands{display:flex;flex-direction:column;gap:16px}
+.bands .bd{border:1px solid rgba(255,255,255,.085);border-radius:14px;padding:22px 28px;background:rgba(255,255,255,.022)}
+.bands .bd .label{margin-bottom:6px}
+.bands .bd .tx{font-size:26px;color:var(--ink2)}
+.bands .bd.os{border-color:rgba(232,189,98,.6);background:rgba(232,189,98,.06);box-shadow:0 0 40px rgba(232,189,98,.08)}
+.bands .bd.os .label{color:var(--gold)}
+
+/* ---------- history ---------- */
+.rail{left:120px;top:64px;width:1680px;height:40px}
+.rail .line{position:absolute;left:0;right:0;top:20px;height:1px;background:var(--rule)}
+.rail .tk{position:absolute;top:0;font-size:17px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);transform:translateX(-50%);padding-top:30px;white-space:nowrap}
+.rail .tk::before{content:"";position:absolute;left:50%;top:15px;width:9px;height:9px;margin-left:-5px;background:#24303f;transform:rotate(45deg)}
+.rail .tk.cur{color:var(--gold)}
+.rail .tk.cur::before{background:var(--gold);box-shadow:0 0 12px rgba(232,189,98,.6)}
+.era{left:120px;top:300px;width:1010px}
+.era .row{display:grid;grid-template-columns:200px 1fr;column-gap:30px;padding:22px 0;border-top:1px solid var(--rule)}
+.era .row .rl{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding-top:8px;line-height:1.4}
+.era .row .c div{font-size:27px;line-height:1.36;color:var(--ink2);margin-bottom:8px;text-wrap:pretty}
+.era .row.os{border-top:1px solid var(--gold-d)}
+.era .row.os .rl{color:var(--gold)}
+.era .row.os .c div{color:#fff}
+.ctss{font-family:var(--mono);font-size:20px;line-height:1.5;color:var(--mute);margin-top:6px}
+.ctss b{color:var(--teal);font-weight:500}
+.grow{left:120px;top:300px;width:1680px;height:640px;display:grid;grid-template-columns:repeat(5,1fr);column-gap:26px;align-items:end}
+.grow .col{display:flex;flex-direction:column;gap:10px}
+.grow .blk{border-radius:10px;border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.022);padding:12px 16px;font-size:21px;color:var(--mute);display:flex;flex-direction:column;justify-content:center}
+.grow .blk.os{border-color:rgba(232,189,98,.6);background:rgba(232,189,98,.07);color:#fff;font-size:22px;line-height:1.35}
+.grow .blk.os.none{border-style:dashed;border-color:#2b3a4d;background:none;color:var(--dim)}
+.grow .yr{font-size:20px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);text-align:center;margin-top:8px}
+.miles div{font-size:34px;line-height:1.3;color:var(--ink2);padding:16px 0;border-top:1px solid var(--rule)}
+.miles div:last-child{color:var(--gold)}
+
+/* ---------- two columns, four cards ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.four{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.four .panel .q{font-size:32px;line-height:1.3;color:#fff;font-weight:500}
+.four .panel .a{font-size:22px;line-height:1.4;color:var(--mute);margin-top:10px}
+.pq{font-size:30px;line-height:1.45;color:var(--ink2);border-left:2px solid var(--gold);padding:6px 0 6px 28px}
+.pq .src{display:block;font-size:20px;color:var(--mute);margin-top:12px}
+.ok{color:var(--teal)} .no{color:var(--red)}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+<style>
+/* ---------- v2: one moving picture per slide, a few label words ---------- */
+.full{position:absolute;inset:0;overflow:hidden}
+.full>img{width:100%;height:100%;object-fit:cover;display:block}
+.duo{filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.3) brightness(.62) contrast(1.15)}
+.dimp{filter:brightness(.5) saturate(.85)}
+.kb{animation:kb 24s ease-in-out infinite alternate;transform-origin:50% 50%}
+@keyframes kb{from{transform:scale(1.03) translate(0,0)}to{transform:scale(1.16) translate(-2.5%,-1.5%)}}
+.static .kb{animation:none}
+.pc>img.prod{filter:brightness(.6) contrast(1.15) saturate(.9)}
+[data-id="every"] .pc>img{animation:kb 18s ease-in-out infinite alternate}
+.code .row.cur{background:rgba(232,189,98,.08)}
+.vig{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,7,13,.9) 0%,rgba(4,7,13,.15) 26%,rgba(4,7,13,.15) 70%,rgba(4,7,13,.92) 100%)}
+.vigL{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(4,7,13,.95) 0%,rgba(4,7,13,.7) 38%,rgba(4,7,13,0) 70%)}
+.ttl{position:absolute;left:120px;top:70px;width:1680px;font-size:62px;font-weight:600;line-height:1.08;letter-spacing:-.01em;text-wrap:balance;text-shadow:0 2px 24px rgba(0,0,0,.7)}
+.ttl .ey{display:block;font-size:22px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:600}
+.lb{position:absolute;font-size:32px;font-weight:600;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9);white-space:nowrap;line-height:1.2}
+.lb.g{color:var(--gold)} .lb.t{color:var(--teal)}
+.lb small{display:block;font-size:24px;font-weight:400;color:var(--ink2);margin-top:4px}
+.yr{position:absolute;font-size:150px;font-weight:300;line-height:1;color:var(--gold);letter-spacing:-.02em;text-shadow:0 0 40px rgba(232,189,98,.3)}
+.big{position:absolute;font-size:86px;font-weight:600;line-height:1.06;text-wrap:balance;text-shadow:0 2px 30px rgba(0,0,0,.8)}
+.cred{position:absolute;right:120px;bottom:62px;font-size:15px;line-height:1.4;color:var(--dim);text-align:right;max-width:1000px}
+.pc{position:absolute;border-radius:12px;overflow:hidden;background:#0a1018;box-shadow:0 18px 44px rgba(0,0,0,.55)}
+.pc>img{width:100%;height:100%;object-fit:cover;display:block}
+.pc .nm{position:absolute;left:0;right:0;bottom:0;padding:44px 18px 14px;background:linear-gradient(180deg,rgba(4,7,13,0),rgba(4,7,13,.92));font-size:24px;color:var(--ink2)}
+.pc .nm b{display:block;font-size:30px;color:#fff;font-weight:600}
+.pc .os{position:absolute;left:14px;top:14px;font-size:22px;font-weight:600;color:#04070d;background:var(--gold);border-radius:6px;padding:3px 10px;opacity:0;transform:scale(.6);transition:all .5s var(--ease)}
+.on .pc .os,.pc.on .os{opacity:1;transform:none}
+/* terminal */
+.tw{position:absolute;background:#060b13;border:1px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.tw .bar{height:46px;background:#0c1420;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:9px;padding:0 16px}
+.tw .bar i{width:12px;height:12px;border-radius:50%;background:#2b3a4d}
+.tw .bar span{margin-left:12px;font-size:22px;color:#dfe5ee;letter-spacing:.03em}
+.tw pre{margin:0;padding:22px 26px;font-family:var(--mono);font-size:24px;line-height:1.5;color:var(--ink2);white-space:pre-wrap}
+.tw .p{color:var(--teal)} .tw .w{color:#fff} .tw .gd{color:var(--gold)} .tw .k{color:#c792ea} .tw .s{color:#c3e88d} .tw .r{color:var(--red)}
+.cursor{display:inline-block;width:12px;height:26px;background:var(--teal);vertical-align:-4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* layered stacks (AI stack, OS model) */
+.band{position:absolute;border:1px solid rgba(255,255,255,.1);background:rgba(10,16,26,.82);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:600;color:var(--ink2);backdrop-filter:blur(4px)}
+.band.os{border-color:rgba(232,189,98,.75);color:var(--gold);background:rgba(28,22,10,.85);box-shadow:0 0 40px rgba(232,189,98,.12)}
+.band.lit{border-color:var(--teal);color:#fff;box-shadow:0 0 30px rgba(63,224,197,.25)}
+.dot{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--teal);box-shadow:0 0 18px var(--teal)}
+/* processes as circles (Core Dumped style) */
+.proc{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px solid var(--teal);background:rgba(63,224,197,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:30px;color:#fff;transition:all .6s var(--ease)}
+.proc small{font-size:18px;color:var(--mute);margin-top:4px}
+.proc.g{border-color:var(--gold);background:rgba(232,189,98,.07)}
+.proc.dead{opacity:.15;transform:scale(.7)}
+.chip2{display:inline-block;font-family:var(--mono);font-size:26px;padding:6px 14px;margin:0 6px;border:1px solid #2b3a4d;border-radius:8px;color:#3a4a60;transition:all .45s var(--ease)}
+.chip2.lit{color:#fff;border-color:var(--gold);box-shadow:0 0 18px rgba(232,189,98,.4)}
+.chip2.done{color:var(--ink2);border-color:#3a4a60}
+/* htop-style cores */
+.cores{position:absolute;display:grid;grid-template-columns:1fr 1fr;column-gap:60px;row-gap:14px;font-family:var(--mono);font-size:24px}
+.core{display:grid;grid-template-columns:44px 1fr 90px;align-items:center;column-gap:12px;color:var(--mute)}
+.core .bar2{height:22px;background:#0f1724;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.core .bar2 i{display:block;height:100%;width:2%;background:linear-gradient(90deg,#3fe07a,#e8bd62 70%,#ff6b6b);transition:width .6s var(--ease)}
+.core .pct2{text-align:right;color:var(--ink2)}
+/* history extras */
+.tape{position:absolute;height:64px;background:#e9dcb8;opacity:.9;overflow:hidden;border-top:1px solid #b8a67a;border-bottom:1px solid #b8a67a}
+.tape .holes{position:absolute;top:0;left:0;height:100%;width:6000px;animation:tape 18s linear infinite;background-image:radial-gradient(circle,#04070d 0 6px,transparent 7px);background-size:28px 21px;background-position:0 0}
+@keyframes tape{from{transform:translateX(0)}to{transform:translateX(-2800px)}}
+.deck{position:absolute;width:150px;height:66px;border-radius:6px;background:#e9dcb8;box-shadow:0 6px 16px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;color:#3a3020;font-weight:600}
+.term4{position:absolute;width:200px;height:150px;margin:-75px 0 0 -100px;border-radius:12px;border:1px solid #2b3a4d;background:rgba(10,16,26,.85);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute);transition:all .3s}
+.term4.lit{border-color:var(--teal);color:#fff;box-shadow:0 0 28px rgba(63,224,197,.35)}
+.flowtxt{position:absolute;font-family:var(--mono);font-size:26px;color:var(--teal);white-space:nowrap}
+/* semester timeline and donut */
+.tline{position:absolute;height:2px;background:var(--rule)}
+.tick{position:absolute;width:2px;height:16px;background:#2b3a4d}
+.mark{position:absolute;transform:translateX(-50%);text-align:center;font-size:26px;color:#fff;white-space:nowrap}
+.mark::before{content:"";display:block;width:16px;height:16px;margin:0 auto 14px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 14px rgba(232,189,98,.5)}
+.mark small{display:block;font-size:22px;color:var(--mute);margin-top:4px}
+</style>
+<style>
+/* ---------- Lecture 8 additions (route map, takeaway, code stepper as in Lectures 3 to 5) ---------- */
+.scene:has(.route) .ttl{width:1240px}
+.route{position:absolute;z-index:4;right:120px;top:30px;display:flex;gap:22px;align-items:flex-start;pointer-events:none}
+.route .st{display:flex;flex-direction:column;align-items:center;gap:9px}
+.route .w{font-size:19px;font-weight:600;letter-spacing:.04em;color:#b3bdcb;white-space:nowrap}
+.route .st.past .w{color:#c9a463}
+.route .st.cur .w{color:var(--gold);text-shadow:0 0 14px rgba(232,189,98,.45)}
+.route .ds{display:flex;gap:5px;height:12px;align-items:center}
+.route .ds i{display:block;position:relative;width:6px;height:6px;border-radius:50%;background:#6f7d92}
+.route .ds i .dr{position:absolute;left:50%;top:100%;width:2px;height:14px;margin-left:-1px;background:var(--teal)}
+.route .ds i .sub{position:absolute;left:50%;top:calc(100% + 15px);transform:translateX(-50%);font-size:18px;font-weight:600;font-style:normal;letter-spacing:.03em;color:var(--teal);white-space:nowrap}
+.route .ds i.m .dr{background:var(--gold)}
+.route .ds i.m .sub{color:var(--gold)}
+.route .ds i.m{width:9px;height:9px;background:#c9a463}
+.route .ds i.on{width:11px;height:11px;background:var(--teal);box-shadow:0 0 10px var(--teal)}
+.route .ds i.m.on{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.tk{left:120px;top:895px;font-size:44px}
+.tk small{font-size:26px}
+/* code stepper: the lit line follows the click */
+.code3{position:absolute;font-family:var(--mono);background:#060b13;border:1px solid var(--rule);border-radius:14px;padding:16px 0;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.code3 .r{padding:3px 24px;line-height:1.5;white-space:pre;color:var(--ink2);border-left:4px solid transparent;transition:background .4s,border-color .4s,color .4s}
+.code3 .r.cur{background:rgba(232,189,98,.12);border-left-color:var(--gold);color:#fff}
+.code3 .c{color:var(--mute)} .code3 .k{color:#c792ea} .code3 .n{color:var(--gold)} .code3 .s{color:#c3e88d}
+.code3 .hd{font-family:var(--sans);font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);padding:0 24px 8px;font-weight:600}
+/* memory map column: one band per region */
+.mm{position:absolute;border:1px solid #2b3a4d;border-radius:14px;background:rgba(10,16,26,.7)}
+.mm .hd{position:absolute;left:18px;top:-36px;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.seg6{position:absolute;left:14px;right:14px;border-radius:8px;border:1px solid #3a4a60;background:rgba(10,16,26,.9);display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:24px;color:#fff;transition:all .6s var(--ease)}
+.seg6 b{font-weight:600} .seg6 span{font-family:var(--mono);font-size:22px;color:var(--mute)}
+.seg6.t{border-color:var(--teal);background:rgba(63,224,197,.12)} .seg6.t span{color:var(--teal)}
+.seg6.g{border-color:var(--gold);background:rgba(232,189,98,.13)} .seg6.g span{color:var(--gold)}
+.seg6.v{border-color:#82aaff;background:rgba(130,170,255,.12)} .seg6.v span{color:#82aaff}
+.seg6.ro{border-color:var(--gold);background:rgba(232,189,98,.2)}
+.seg6.gone{opacity:.3;border-style:dashed;background:transparent}
+.seg6.off{opacity:0;transform:scaleY(.4)}
+.seg6.hot{box-shadow:0 0 26px rgba(63,224,197,.55)}
+.gap6{position:absolute;left:14px;right:14px;text-align:center;font-size:22px;color:var(--mute);letter-spacing:.2em}
+/* byte cells */
+.cell6{position:absolute;width:60px;height:60px;border:1px solid #2b3a4d;border-radius:8px;background:rgba(10,16,26,.92);font-family:var(--mono);font-size:26px;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .45s var(--ease)}
+.cell6.t{border-color:var(--teal);color:var(--teal);box-shadow:0 0 14px rgba(63,224,197,.35)}
+.cell6.g{border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(232,189,98,.45)}
+.cell6.dim{color:var(--mute)}
+.cell6.w{width:150px}
+/* memory search grid */
+.grid6 .cell6{width:150px;height:62px;font-size:24px;color:var(--mute)}
+.grid6 .cell6.hit{border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(232,189,98,.45)}
+.grid6 .cell6.one{border-color:var(--teal);color:#fff;background:rgba(63,224,197,.2);box-shadow:0 0 22px rgba(63,224,197,.6)}
+.hud6{position:absolute;font-family:var(--mono);font-size:40px;color:#fff;padding:14px 26px;border:1px solid var(--rule);border-radius:12px;background:#060b13}
+.hud6 b{color:var(--gold);font-weight:500}
+/* boxes for diagrams */
+.box6{position:absolute;border:1px solid #2b3a4d;border-radius:14px;background:rgba(10,16,26,.88);padding:18px 22px;font-size:28px;color:#fff;font-weight:600;transition:all .5s var(--ease)}
+.box6 small{display:block;font-size:22px;font-weight:400;color:var(--ink2);margin-top:6px}
+.box6.t{border-color:var(--teal)} .box6.g{border-color:var(--gold);background:rgba(28,22,10,.85)}
+.box6.lit{box-shadow:0 0 30px rgba(63,224,197,.45)}
+.arr6{fill:none;stroke:#6f7d92;stroke-width:3}
+.arr6.t{stroke:var(--teal)} .arr6.g{stroke:var(--gold)} .arr6.r{stroke:var(--red)}
+.bigq6{position:absolute;font-size:56px;font-weight:600;line-height:1.15;color:#fff}
+.fitwrap{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:960px 200px}
+</style>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <marker id="a8T" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3fe0c5"/></marker>
+    <marker id="a8G" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e8bd62"/></marker>
+    <marker id="a8M" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6f7d92"/></marker>
+    <marker id="a8R" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff6b6b"/></marker>
+  </defs>
+</svg>
+<style>
+/* address bits: one cell per field */
+.va7{position:absolute;display:flex;gap:10px;font-family:var(--mono)}
+.va7 .f{border:1px solid #3a4a60;border-radius:10px;background:rgba(10,16,26,.92);padding:10px 18px;text-align:center;transition:all .45s var(--ease)}
+.va7 .f b{display:block;font-size:30px;font-weight:500;color:#fff}
+.va7 .f span{display:block;font-family:var(--sans);font-size:20px;color:var(--mute);margin-top:4px}
+.va7 .f.g{border-color:var(--gold)} .va7 .f.g b{color:var(--gold)}
+.va7 .f.t{border-color:var(--teal)} .va7 .f.t b{color:var(--teal)}
+.tb7{position:absolute;border-collapse:collapse;font-family:var(--mono);font-size:26px}
+.tb7 td,.tb7 th{border:1px solid #2b3a4d;padding:8px 18px;color:#fff;text-align:center;transition:background .4s,color .4s}
+.tb7 th{font-family:var(--sans);font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600;background:#0c1420}
+.tb7 tr.hit td{background:rgba(232,189,98,.18);color:var(--gold)}
+.res7{position:absolute;font-family:var(--mono);font-size:44px;color:#fff;transition:opacity .4s}
+.res7 small{display:block;font-family:var(--sans);font-size:24px;color:var(--ink2);margin-top:6px}
+.res7.bad{color:var(--red)}
+.fr7{position:absolute;width:150px;height:56px;border:1px solid #3a4a60;border-radius:8px;background:rgba(10,16,26,.9);font-size:22px;color:var(--mute);display:flex;align-items:center;justify-content:center;transition:all .5s var(--ease)}
+.fr7.t{border-color:var(--teal);color:#fff;background:rgba(63,224,197,.15)} .fr7.g{border-color:var(--gold);color:#fff;background:rgba(232,189,98,.15)} .fr7.v{border-color:#82aaff;color:#fff;background:rgba(130,170,255,.15)}
+</style>
+
+  <style>
+.bar8{position:absolute;height:54px;border-radius:8px;transition:width 1.2s var(--ease)}
+.line8{position:absolute;display:flex;gap:4px}
+.line8 i{display:block;width:44px;height:44px;border-radius:6px;border:1px solid #2b3a4d;background:rgba(10,16,26,.9);font-style:normal;font-family:var(--mono);font-size:18px;color:var(--mute);text-align:center;line-height:44px;transition:all .3s}
+.line8 i.miss{border-color:var(--red);color:var(--red);background:rgba(255,107,107,.15)}
+.line8 i.hit{border-color:var(--teal);color:#fff;background:rgba(63,224,197,.2)}
+.slot8{position:absolute;width:150px;height:84px;border:1px solid #2b3a4d;border-radius:10px;background:rgba(10,16,26,.9);text-align:center;font-family:var(--mono);font-size:34px;color:#fff;padding-top:10px;transition:all .4s}
+.slot8 small{display:block;font-family:var(--sans);font-size:18px;color:var(--mute)}
+.slot8.fast{border-color:var(--teal);background:rgba(63,224,197,.2);box-shadow:0 0 22px rgba(63,224,197,.5)}
+.slot8.g{border-color:var(--gold);color:var(--gold)}
+</style>
+  <section class="scene" data-id="title" data-title="Caching" data-chapter="">
+    <div class="abs" style="left:120px;top:190px;width:1000px">
+      <div class="eyebrow" data-b="0" style="--d:.2s">COP 4610 · Operating Systems · Lecture 8</div>
+      <h1 class="h1" data-b="0" style="--d:.4s;margin-top:36px;font-size:120px"><span class="gold glow">Caching</span></h1>
+      <div class="lead" data-b="0" style="--d:.7s;margin-top:26px;font-size:30px">Hits and misses · the TLB · Meltdown and Spectre</div>
+      <div data-b="0" style="--d:1s;margin-top:60px">
+        <div style="font-size:38px;font-weight:600;color:#fff">Xin Liu</div>
+        <div class="small" style="margin-top:8px;color:var(--ink2)">Department of Computer Science · Florida State University · Wednesday, February 3, 2027</div>
+      </div>
+    </div>
+    <div class="box6 t" data-b="0" style="--d:.3s;left:1260px;top:190px;width:300px;height:100px;text-align:center">CPU</div>
+    <div class="box6 g" data-b="0" style="--d:.4s;left:1220px;top:360px;width:380px;height:100px;text-align:center">cache<small>small, fast</small></div>
+    <div class="box6" data-b="0" style="--d:.5s;left:1160px;top:530px;width:500px;height:100px;text-align:center">memory<small>big, slow</small></div>
+    <div class="box6" data-b="0" style="--d:.6s;left:1100px;top:700px;width:620px;height:100px;text-align:center">disk<small>huge, very slow</small></div>
+    <div class="dot" id="tiDot" style="left:1410px;top:300px;opacity:0"></div>
+    <div class="lb" id="tiHit" style="left:1640px;top:385px;font-size:30px;color:var(--teal);opacity:0;transition:opacity .4s">hit</div>
+    <div class="cred" data-b="0" style="--d:1.3s;left:120px;right:auto;text-align:left">After Xin Liu's 2025 COP 4610 slides (Lecture 8), the SEED Labs Meltdown and Spectre labs, and OSTEP Chapter 19</div>
+  </section>
+  <section class="scene" data-id="latency" data-title="If L1 took one second" data-chapter="01 · Hierarchy">
+    <div class="route" data-sub="how slow?" data-t="1"></div>
+    <div class="ttl" data-b="0">If an L1 cache hit took one second</div>
+    <div class="abs" id="ltBars" data-b="0" style="--d:.2s;left:120px;top:220px;width:1680px;height:520px"></div>
+    <div class="lb" data-b="1" style="left:120px;top:770px;font-size:30px">Each level down: bigger, cheaper per byte, and much slower<small>a cache puts the data you use now in the small, fast level</small></div>
+    <div class="lb g tk" data-b="2">Each level down is far slower, so keep the data you need close</div>
+    <div class="cred" data-b="0" style="--d:.8s">Latency numbers after Jeff Dean and Peter Norvig (approximate) · scaled so that 0.5 ns = 1 second</div>
+  </section>
+  <section class="scene" data-id="locality" data-title="Locality" data-chapter="01 · Hierarchy">
+    <div class="route" data-sub="locality" data-t="1"></div>
+    <div class="ttl" data-b="0">Why caches work: locality</div>
+    <div class="code3" data-b="0" style="--d:.2s;left:120px;top:210px;width:760px;font-size:28px">
+      <div class="r" data-l="0">int sum = 0;</div>
+      <div class="r" data-l="1"><span class="k">for</span> (int i = 0; i &lt; 32; i++)</div>
+      <div class="r" data-l="2">    sum += a[i];</div>
+    </div>
+    <div class="lb" data-b="0" style="--d:.3s;left:960px;top:210px;font-size:26px;color:var(--ink2)">a[0] … a[31]: 4-byte ints · a cache line holds 64 bytes = 16 ints</div>
+    <div class="line8" id="lcLine" data-b="0" style="--d:.3s;left:960px;top:270px;flex-wrap:wrap;width:780px"></div>
+    <div class="lb" id="lcCap" style="left:960px;top:420px;font-size:30px"></div>
+    <div class="lb" data-b="2" style="left:120px;top:540px;font-size:32px">Spatial locality: the next a[i] is in the same line<small>one miss brings in 16 ints; the next 15 hit</small></div>
+    <div class="lb" data-b="3" style="left:120px;top:660px;font-size:32px">Temporal locality: sum, i, and the loop's code are used again and again<small>they stay in the cache the whole time</small></div>
+    <div class="lb g tk" data-b="4">Programs reuse what they just touched, and touch what sits next to it</div>
+    <div class="cred" data-b="0" style="--d:.8s">64-byte cache lines on x86-64 · after Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
+  </section>
+  <section class="scene" data-id="eat" data-title="Effective access time" data-chapter="02 · Hit or miss">
+    <div class="route" data-sub="the math" data-t="2"></div>
+    <div class="ttl" data-b="0">A high hit rate hides slow memory</div>
+    <div class="lb" data-b="0" style="--d:.2s;left:120px;top:220px;font-size:40px">effective time = P(hit) × hit cost + P(miss) × miss cost</div>
+    <div class="box6 t" data-b="0" style="--d:.3s;left:120px;top:330px;width:500px;height:120px">cache hit: 99%<small>check the cache: 2 cycles</small></div>
+    <div class="box6 g" data-b="0" style="--d:.4s;left:700px;top:330px;width:560px;height:120px">cache miss: 1%<small>check (2) + go to memory (4) = 6 cycles</small></div>
+    <div class="lb mono" id="eaA" style="left:120px;top:520px;font-size:40px;color:#fff"></div>
+    <div class="lb mono" id="eaB" style="left:120px;top:600px;font-size:40px;color:#fff"></div>
+    <div class="lb mono" id="eaC" style="left:120px;top:680px;font-size:52px;color:var(--gold)"></div>
+    <div class="lb g tk" data-b="4">A high hit rate makes the slow level almost disappear</div>
+    <div class="cred" data-b="0" style="--d:.8s">Example from Xin Liu's 2025 COP 4610 slides (Lecture 8) · cycle counts illustrative</div>
+  </section>
+  <section class="scene" data-id="twolevel" data-title="Two levels of cache" data-chapter="02 · Hit or miss">
+    <div class="route" data-sub="L1 and L2" data-t="2"></div>
+    <div class="ttl" data-b="0">Two levels: work from the bottom up</div>
+    <table class="tb7" data-b="0" style="--d:.2s;left:120px;top:220px"><tr><th></th><th>access time</th><th>hit rate</th></tr>
+      <tr><td>L1 cache</td><td>1 cycle</td><td>50%</td></tr><tr><td>L2 cache</td><td>2 cycles</td><td>50%</td></tr><tr><td>memory</td><td>4 cycles</td><td>100%</td></tr></table>
+    <div class="box6" id="tvM" data-b="0" style="--d:.3s;left:1100px;top:700px;width:420px;height:110px;text-align:center">memory<small>T = 4</small></div>
+    <div class="box6" id="tvL2" data-b="0" style="--d:.3s;left:1140px;top:470px;width:340px;height:110px;text-align:center">L2<small id="tvL2t">T = ?</small></div>
+    <div class="box6" id="tvL1" data-b="0" style="--d:.3s;left:1180px;top:240px;width:260px;height:110px;text-align:center">L1<small id="tvL1t">T = ?</small></div>
+    <svg class="abs" data-b="0" style="--d:.4s;left:0;top:0" width="1920" height="1080"><path class="arr6" d="M 1310 352 L 1310 464" marker-end="url(#a8M)"/><path class="arr6" d="M 1310 582 L 1310 694" marker-end="url(#a8M)"/></svg>
+    <div class="lb mono" id="tvA" style="left:120px;top:540px;font-size:34px;color:#fff"></div>
+    <div class="lb mono" id="tvB" style="left:120px;top:640px;font-size:34px;color:#fff"></div>
+    <div class="lb g tk" data-b="3">Each level's misses pay for the level below; compute from the bottom up</div>
+    <div class="cred" data-b="0" style="--d:.8s">Example from Xin Liu's 2025 COP 4610 slides (Lecture 8) · numbers illustrative</div>
+  </section>
+  <section class="scene" data-id="misses" data-title="Why misses happen" data-chapter="02 · Hit or miss">
+    <div class="route" data-sub="four misses" data-t="2"></div>
+    <div class="ttl" data-b="0">Four reasons to miss</div>
+    <div class="box6 t" data-b="0" style="--d:.2s;left:120px;top:220px;width:800px;height:150px">Compulsory<small>the first touch of any data, for example right after boot</small></div>
+    <div class="box6 t" data-b="0" style="--d:.4s;left:1000px;top:220px;width:800px;height:150px">Capacity<small>the data a program uses does not fit,<br>for example a hash table bigger than the cache</small></div>
+    <div class="box6 t" data-b="0" style="--d:.6s;left:120px;top:440px;width:800px;height:150px">Conflict (competing entries)<small>two hot items map to the same slot, and keep evicting each other</small></div>
+    <div class="box6 t" data-b="0" style="--d:.8s;left:1000px;top:440px;width:800px;height:150px">Policy<small>the replacement policy threw out the wrong entry</small></div>
+    <div class="lb" data-b="1" style="left:120px;top:680px;font-size:36px">Compulsory · Capacity · Conflict · Policy: three C's and a P</div>
+    <div class="lb g tk" data-b="2">Some misses are unavoidable; the others depend on size, layout, and policy</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
+  </section>
+  <section class="scene" data-id="tlb" data-title="The TLB caches translations" data-chapter="03 · TLB">
+    <div class="route" data-sub="the TLB" data-t="3"></div>
+    <div class="ttl" data-b="0">The TLB: a cache of recent translations</div>
+    <div class="box6 t" data-b="0" style="--d:.2s;left:120px;top:400px;width:300px;height:130px;text-align:center">CPU<small>virtual page</small></div>
+    <div class="box6 g" data-b="0" style="--d:.3s;left:600px;top:390px;width:360px;height:150px;text-align:center">TLB<small>a few dozen to a few<br>thousand entries</small></div>
+    <div class="box6" data-b="0" style="--d:.4s;left:1460px;top:400px;width:340px;height:130px;text-align:center">physical memory</div>
+    <div class="box6" data-b="1" style="left:600px;top:700px;width:360px;height:120px;text-align:center">page table walk<small>4 memory reads (Lecture 7)</small></div>
+    <svg class="abs" data-b="0" style="--d:.5s;left:0;top:0" width="1920" height="1080"><path class="arr6 t" d="M 424 465 L 594 465" marker-end="url(#a8T)"/><path class="arr6 t" d="M 964 465 L 1454 465" marker-end="url(#a8T)"/></svg>
+    <svg class="abs" data-b="1" style="left:0;top:0" width="1920" height="1080"><path class="arr6 r" d="M 780 544 L 780 694" marker-end="url(#a8R)"/><path class="arr6 g" d="M 964 760 C 1100 760 1100 520 966 515" marker-end="url(#a8G)"/></svg>
+    <div class="lb t" data-b="0" style="--d:.6s;left:1050px;top:400px;font-size:30px">hit: done in about a cycle</div>
+    <div class="lb" data-b="1" style="--d:.3s;left:1100px;top:640px;font-size:30px;color:var(--red)">miss: walk, then remember<small>the new translation goes into the TLB</small></div>
+    <div class="lb g tk" data-b="2">The TLB remembers recent translations, so most accesses skip the walk</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19</div>
+  </section>
+  <section class="scene" data-id="tlbx" data-title="A TLB lookup" data-chapter="03 · TLB">
+    <div class="route" data-sub="lookup" data-t="3"></div>
+    <div class="ttl" data-b="0">Look up a TLB, one access at a time</div>
+    <table class="tb7" data-b="0" style="--d:.2s;left:120px;top:220px" id="txTab"><tr><th>virtual page</th><th>physical page</th><th>control</th></tr>
+      <tr data-s="0"><td>2</td><td>1</td><td>valid, rw</td></tr><tr data-s="1"><td>–</td><td>–</td><td>invalid</td></tr><tr data-s="2"><td id="txV2">0</td><td id="txP2">4</td><td>valid, rw</td></tr></table>
+    <div class="va7" id="txVa" style="left:1000px;top:220px"></div>
+    <div class="res7" id="txRes" style="left:1000px;top:380px"></div>
+    <div class="lb" id="txCap" style="left:120px;top:560px;font-size:30px"></div>
+    <div class="lb g tk" data-b="3">Hit: use it. Miss: walk the table, fill an entry, try again</div>
+    <div class="cred" data-b="0" style="--d:.8s">TLB contents from Xin Liu's 2025 COP 4610 slides (Lecture 8) · page 5's frame illustrative</div>
+  </section>
+  <section class="scene" data-id="assoc" data-title="Where can an entry go?" data-chapter="03 · TLB">
+    <div class="route" data-sub="where to look" data-t="3"></div>
+    <div class="ttl" data-b="0">Where can an entry go? Three designs</div>
+    <div class="box6" data-b="0" style="--d:.2s;left:120px;top:220px;width:540px;height:400px">direct mapped<small>bits of the page number pick one slot</small>
+      <div class="fr7" style="left:30px;top:130px;width:480px">slot 0</div><div class="fr7 g" style="left:30px;top:196px;width:480px">slot 1 ← the only place</div><div class="fr7" style="left:30px;top:262px;width:480px">slot 2</div></div>
+    <div class="box6" data-b="0" style="--d:.4s;left:690px;top:220px;width:540px;height:400px">2-way set associative<small>bits pick a set; check both ways at once</small>
+      <div class="fr7 g" style="left:30px;top:130px;width:225px">set 0 · way 0</div><div class="fr7 g" style="left:265px;top:130px;width:225px">set 0 · way 1</div><div class="fr7" style="left:30px;top:196px;width:225px">set 1 · way 0</div><div class="fr7" style="left:265px;top:196px;width:225px">set 1 · way 1</div></div>
+    <div class="box6" data-b="0" style="--d:.6s;left:1260px;top:220px;width:540px;height:400px">fully associative<small>any slot; compare all of them at once</small>
+      <div class="fr7 g" style="left:30px;top:130px;width:480px">slot 0</div><div class="fr7 g" style="left:30px;top:196px;width:480px">slot 1</div><div class="fr7 g" style="left:30px;top:262px;width:480px">slot 2</div></div>
+    <div class="lb" data-b="1" style="left:120px;top:680px;font-size:30px">cheap, but two hot pages can fight over one slot</div>
+    <div class="lb" data-b="1" style="--d:.2s;left:1260px;top:680px;font-size:30px">no fights, but many comparators<small>small TLBs are often built this way</small></div>
+    <div class="lb g tk" data-b="2">More places to look means fewer conflicts, but more hardware</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
+  </section>
+  <section class="scene" data-id="switch" data-title="TLB entries belong to one process" data-chapter="03 · TLB">
+    <div class="route" data-sub="switching" data-t="3"></div>
+    <div class="ttl" data-b="0">Switch processes, and the TLB is wrong</div>
+    <div class="box6 t" data-b="0" style="--d:.2s;left:120px;top:230px;width:420px;height:120px">process A<small>page 2 → frame 1</small></div>
+    <div class="box6 v" data-b="0" style="--d:.3s;left:120px;top:420px;width:420px;height:120px;border-color:#82aaff">process B<small>page 2 → frame 9</small></div>
+    <table class="tb7" data-b="0" style="--d:.4s;left:700px;top:240px" id="swTab"><tr><th>ASID</th><th>virtual page</th><th>physical page</th></tr><tr><td id="swA1">–</td><td>2</td><td>1</td></tr><tr><td id="swA2">–</td><td>0</td><td>4</td></tr></table>
+    <div class="lb" data-b="0" style="--d:.5s;left:700px;top:440px;font-size:30px;color:var(--red)">B runs next: its page 2 would wrongly go to frame 1</div>
+    <div class="lb" data-b="1" style="left:120px;top:620px;font-size:32px">Fix 1: flush the TLB at every switch<small>simple, but every process starts cold</small></div>
+    <div class="lb" data-b="1" style="--d:.3s;left:1000px;top:620px;font-size:32px">Fix 2: tag each entry with an address-space ID<small>x86 PCID, Arm ASID: entries of many processes live together</small></div>
+    <div class="lb g tk" data-b="2">A translation is only true for one address space: flush it or tag it</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19</div>
+  </section>
+  <section class="scene" data-id="lru" data-title="Which entry to throw out?" data-chapter="04 · Writes">
+    <div class="route" data-sub="replacement" data-t="4"></div>
+    <div class="ttl" data-b="0">The cache is full. Who leaves?</div>
+    <div class="lb mono" data-b="0" style="--d:.2s;left:120px;top:220px;font-size:36px;color:var(--ink2)">accesses: <span id="lrSeq"></span></div>
+    <div class="abs" id="lrSlots" data-b="0" style="--d:.3s;left:120px;top:320px;width:700px;height:120px"></div>
+    <div class="lb" id="lrCap" style="left:120px;top:480px;font-size:32px"></div>
+    <div class="lb" data-b="0" style="--d:.5s;left:1000px;top:320px;font-size:30px">LRU: throw out the least recently used<small>good when the past predicts the future</small></div>
+    <div class="lb" data-b="0" style="--d:.6s;left:1000px;top:460px;font-size:30px">Random: throw out any one<small>simple and fast; hardware TLBs often do this</small></div>
+    <div class="lb g tk" data-b="5">Replacement is a guess about the future; LRU bets on locality</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 22 has more policies</div>
+  </section>
+  <section class="scene" data-id="writes" data-title="Write-through or write-back" data-chapter="04 · Writes">
+    <div class="route" data-sub="writes" data-t="4"></div>
+    <div class="ttl" data-b="0">When does memory see a write?</div>
+    <div class="box6 t" data-b="0" style="--d:.2s;left:120px;top:230px;width:780px;height:120px">write-through<small>write to the cache and to memory, right away</small></div>
+    <div class="box6 g" data-b="0" style="--d:.3s;left:1020px;top:230px;width:780px;height:120px">write-back<small>write to the cache only; memory later, when the line leaves</small></div>
+    <div class="abs" id="wrT" data-b="0" style="--d:.4s;left:120px;top:400px;width:780px;height:300px"></div>
+    <div class="abs" id="wrB" data-b="0" style="--d:.4s;left:1020px;top:400px;width:780px;height:300px"></div>
+    <div class="lb" data-b="1" style="left:120px;top:740px;font-size:30px">always in sync, but every write is slow</div>
+    <div class="lb" data-b="1" style="--d:.2s;left:1020px;top:740px;font-size:30px">many writes become one, but memory is stale for a while</div>
+    <div class="lb g tk" data-b="2">Write-through stays in sync; write-back saves traffic. Speed against consistency</div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
+  </section>
+  <section class="scene" data-id="secret" data-title="Remember a secret through the cache" data-chapter="05 · Meltdown">
+    <div class="route" data-sub="the puzzle" data-t="5"></div>
+    <div class="ttl" data-b="0">A puzzle: your memory will be erased</div>
+    <div class="box6 g" data-b="0" style="--d:.2s;left:120px;top:230px;width:640px;height:130px">You see a secret number: 7<small>then everything you did is rolled back, and your memory erased</small></div>
+    <div class="box6 t" data-b="0" style="--d:.4s;left:120px;top:420px;width:640px;height:130px">Only one thing survives: the CPU cache<small>which lines are in it</small></div>
+    <div class="abs" id="scSlots" data-b="1" style="left:880px;top:230px;width:920px;height:300px"></div>
+    <div class="lb" data-b="1" style="--d:.3s;left:120px;top:620px;font-size:32px">Before the erase: touch array[7 × 4096]<small>now the line for slot 7 is in the cache</small></div>
+    <div class="lb" data-b="2" style="left:120px;top:760px;font-size:32px">After: time a read of every slot. Slot 7 is fast</div>
+    <div class="lb g tk" data-b="3">The cache remembers what you touched, even after the rollback</div>
+    <div class="cred" data-b="0" style="--d:.8s">Puzzle after Xin Liu's 2025 COP 4610 slides and the SEED Labs Meltdown lab (Wenliang Du) · times illustrative</div>
+  </section>
+  <section class="scene" data-id="flush" data-title="Flush+Reload" data-chapter="05 · Meltdown">
+    <div class="route" data-sub="Flush+Reload" data-t="5"></div>
+    <div class="ttl" data-b="0">Flush+Reload: read a byte out of the cache</div>
+    <div class="code3" data-b="0" style="--d:.2s;left:120px;top:210px;width:900px;font-size:25px">
+      <div class="r" data-l="0"><span class="c">// 1. FLUSH: throw every slot out of the cache</span></div>
+      <div class="r" data-l="1"><span class="k">for</span> (i = 0; i &lt; 256; i++) _mm_clflush(&amp;array[i * 4096]);</div>
+      <div class="r" data-l="2"><span class="c">// 2. the victim touches one slot: array[secret * 4096]</span></div>
+      <div class="r" data-l="3"><span class="c">// 3. RELOAD: time a read of every slot</span></div>
+      <div class="r" data-l="4"><span class="k">for</span> (i = 0; i &lt; 256; i++)</div>
+      <div class="r" data-l="5">    <span class="k">if</span> (time_read(&amp;array[i * 4096]) &lt; THRESHOLD) secret = i;</div>
+    </div>
+    <div class="abs" id="flSlots" data-b="0" style="--d:.3s;left:120px;top:520px;width:1680px;height:200px"></div>
+    <div class="lb" id="flCap" style="left:120px;top:760px;font-size:32px"></div>
+    <div class="lb g tk" data-b="4">Timing one read per slot turns a cache footprint back into a number</div>
+    <div class="cred" data-b="0" style="--d:.8s">After the SEED Labs Meltdown and Spectre labs (Wenliang Du) · slots shown: 8 of 256 · times illustrative</div>
+  </section>
+  <section class="scene" data-id="meltdown" data-title="Meltdown" data-chapter="05 · Meltdown">
+    <div class="route" data-sub="Meltdown" data-t="5"></div>
+    <div class="ttl" data-b="0">2018, Meltdown: read the kernel's memory</div>
+    <div class="code3" data-b="0" style="--d:.2s;left:120px;top:210px;width:960px;font-size:26px">
+      <div class="r" data-l="0">char s = *(char *)kernel_address;     <span class="c">// not allowed: faults</span></div>
+      <div class="r" data-l="1">array[s * 4096] += 1;                 <span class="c">// ... but runs ahead</span></div>
+    </div>
+    <div class="box6" id="mdCheck" data-b="0" style="--d:.3s;left:1160px;top:210px;width:640px;height:120px">permission check<small>user mode may not read kernel memory</small></div>
+    <div class="lb" id="mdCap" style="left:120px;top:400px;font-size:32px;white-space:normal;width:1680px"></div>
+    <div class="lb" data-b="3" style="left:120px;top:600px;font-size:32px">Fix: KPTI, Kernel Page-Table Isolation<small>user mode runs with page tables that do not map the kernel at all; system calls get slower</small></div>
+    <div class="lb g tk" data-b="4">Out-of-order execution ran ahead of the check, and the cache kept the result</div>
+    <div class="cred" data-b="0" style="--d:.8s">Lipp et al., "Meltdown", USENIX Security 2018 (disclosed January 2018) · after the SEED Labs Meltdown lab · mostly Intel CPUs</div>
+  </section>
+  <section class="scene" data-id="spectre" data-title="Spectre" data-chapter="06 · Spectre">
+    <div class="route" data-sub="Spectre" data-t="6"></div>
+    <div class="ttl" data-b="0">Spectre: trick the branch predictor</div>
+    <div class="code3" data-b="0" style="--d:.2s;left:120px;top:210px;width:960px;font-size:26px">
+      <div class="r" data-l="0"><span class="k">if</span> (x &lt; size)                   <span class="c">// the bounds check</span></div>
+      <div class="r" data-l="1">    y = array2[array1[x] * 4096];</div>
+    </div>
+    <div class="lb" id="spCap" style="left:120px;top:400px;font-size:32px;white-space:normal;width:1680px"></div>
+    <div class="abs" id="spTrain" style="left:120px;top:520px;width:1680px;height:120px"></div>
+    <div class="lb" data-b="4" style="left:120px;top:700px;font-size:30px">This pattern guards sandboxes, like JavaScript in a browser<small>browsers cut timer precision and put sites in separate processes</small></div>
+    <div class="lb g tk" data-b="5">The CPU guessed past a bounds check; the cache kept the secret</div>
+    <div class="cred" data-b="0" style="--d:.8s">Kocher et al., "Spectre Attacks", IEEE S&amp;P 2019 (disclosed January 2018) · Intel, AMD, and Arm CPUs · after the SEED Labs Spectre lab</div>
+  </section>
+  <section class="scene" data-id="variants" data-title="Speed leaves footprints" data-chapter="06 · Spectre">
+    <div class="route" data-sub="since 2018" data-t="6" data-br="1"></div>
+    <div class="ttl" data-b="0">Since 2018: the footprints keep coming</div>
+    <div class="abs" id="vaLine" data-b="0" style="--d:.2s;left:120px;top:260px;width:1680px;height:360px"></div>
+    <div class="lb" data-b="1" style="left:120px;top:680px;font-size:32px">Each one: a speed trick inside the CPU leaves a trace that software can time<small>fixes are microcode updates and OS workarounds, and each one costs some speed</small></div>
+    <div class="lb g tk" data-b="2">Speed tricks leave footprints in the cache; secrets can leak through them</div>
+    <div class="cred" data-b="0" style="--d:.8s">Foreshadow (USENIX Security 2018) · ZombieLoad (CCS 2019) · Downfall (USENIX Security 2023, Daniel Moghimi)</div>
+  </section>
+  <section class="scene" data-id="end" data-title="Takeaways" data-chapter="Closing">
+    <div class="ttl" data-b="0">Caching: fast because of locality, risky because of footprints</div>
+    <div class="box6 t" data-b="0" style="--d:.2s;left:120px;top:230px;width:540px;height:200px">hierarchy<small>small and fast near the CPU,<br>big and slow far away;<br>locality makes the hit rate high</small></div>
+    <div class="box6 g" data-b="0" style="--d:.35s;left:690px;top:230px;width:540px;height:200px">the TLB<small>caches translations;<br>flush or tag on a switch;<br>replacement guesses the future</small></div>
+    <div class="box6" data-b="0" style="--d:.5s;left:1260px;top:230px;width:540px;height:200px;border-color:var(--red)">side channels<small>Flush+Reload times the cache;<br>Meltdown and Spectre read<br>what they should not</small></div>
+    <div class="lb g" data-b="1" style="left:120px;top:560px;font-size:34px">Next · Monday, February 8 · Lecture 9: the stack<small>how calls and returns use memory, and why a return address is a target · read OSTEP Chapter 19</small></div>
+    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19 · SEED Labs</div>
+  </section>
+
+  <div id="hud"><div class="l" id="hudL"></div><div class="r num" id="hudR"></div><div id="prog"></div></div>
+</div>
+</div>
+<div id="help">→ next · ← back · G index · number + Enter: go to page · F full screen</div>
+<div id="notes"><div class="meta"><b id="nTitle"></b><span id="nPos"></span><span id="nNext"></span><span id="nClock">00:00</span></div><div id="nRow"><div id="nBody"></div><div id="nZh"></div></div></div>
+<div id="overview"><div class="ovHead"><span class="ovT">Index</span><span class="ovHint">Tap a page to go there · Tap the page number on any slide to come back here · Type a page number, then Enter · Home: first page · G or Esc: close · − / = slide size · Shift+↑↓ move · R reset</span></div><div id="ovGrid"></div></div>
+<div id="jumpBox"></div>
+<div id="sizeBox"></div>
+
+<script>
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const SVGNS='http://www.w3.org/2000/svg';
+const mk=(tag,attrs,parent)=>{const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;};
+const STATIC=()=>document.documentElement.classList.contains('static');
+
+/* =====================================================================
+   v2 SCENE ANIMATIONS: every slide moves
+   ===================================================================== */
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const timers={};function clearT(k){(timers[k]||[]).forEach(t=>{clearTimeout(t);clearInterval(t);});timers[k]=[];}
+function addT(k,t){(timers[k]=timers[k]||[]).push(t);return t;}
+// type segments [[text,cls],...] into a <pre>, char by char; then call done
+function typeInto(k,el,segs,cps,done){clearT(k);el.innerHTML='';let i=0,j=0,html='';const step=()=>{
+  if(i>=segs.length){el.innerHTML=html;done&&done();return;}
+  const [t,c]=segs[i];const n=Math.max(1,Math.round(cps/60));const piece=t.slice(j,j+n);j+=n;
+  const cur=html+(c?`<span class="${c}">${esc(t.slice(0,j))}</span>`:esc(t.slice(0,j)));
+  el.innerHTML=cur+'<span class="cursor"></span>';
+  if(j>=t.length){html+=c?`<span class="${c}">${esc(t)}</span>`:esc(t);i++;j=0;}
+  addT(k,setTimeout(step,1000/60));};
+  if(STATIC()){el.innerHTML=segs.map(([t,c])=>c?`<span class="${c}">${esc(t)}</span>`:esc(t)).join('');done&&done();return;}
+  step();}
+
+/* =====================================================================
+   LECTURE 8 ANIMATIONS: caching, the TLB, Meltdown and Spectre
+   Every animation plays once and holds its last picture (KB slides T24);
+   steppers show one step of the code or the math per click (KB slides T25).
+   ===================================================================== */
+
+/* ---------- route map (KB slides T24) ---------- */
+(()=>{const W=['Hierarchy','Hit or miss','TLB','Writes','Meltdown','Spectre'];const rs=$$('.route');const G=W.map(()=>[]);
+  rs.forEach((r,i)=>G[+r.dataset.t-1].push({i,m:!r.dataset.br}));
+  rs.forEach((r,ri)=>{const t=+r.dataset.t;r.innerHTML=W.map((w,k)=>`<div class="st${k+1<t?' past':(k+1===t?' cur':'')}"><div class="w">${w}</div><div class="ds">${G[k].map(g=>g.i===ri?`<i class="${g.m?'m ':''}on"><b class="dr"></b><span class="sub">${r.dataset.sub||''}</span></i>`:`<i class="${g.m?'m':''}"></i>`).join('')}</div></div>`).join('');});})();
+function cur8(id,ls){$$(`[data-id="${id}"] .code3 .r`).forEach(r=>r.classList.toggle('cur',ls.includes(+r.dataset.l)));}
+
+/* ---------- 1. title: a miss goes all the way down; the next access hits ---------- */
+const Title8={start(){clearT('ti');const d=$('#tiDot'),h=$('#tiHit');const P=[[1410,300],[1410,470],[1410,640],[1410,810],[1410,300],[1410,470]];
+  if(STATIC()){d.style.opacity=0;h.style.opacity=1;return;}h.style.opacity=0;
+  const go=(k,ms)=>{d.style.transition=`top ${ms}ms linear,opacity .3s`;d.style.left=P[k][0]+'px';d.style.top=P[k][1]+'px';};
+  d.style.transition='none';go(0,0);d.style.opacity=1;
+  [[500,1,500],[1050,2,500],[1600,3,500],[2300,4,1100],[3700,5,500]].forEach(([t,k,ms])=>addT('ti',setTimeout(()=>go(k,ms),t)));
+  addT('ti',setTimeout(()=>{h.style.opacity=1;d.style.opacity=0;},4300));},stop(){clearT('ti');}};
+
+/* ---------- 2. latency, stretched so that L1 = 1 second ---------- */
+const Lat8=(()=>{let built=false;const R=[['L1 cache hit','0.5 ns','1 second',0],['L2 cache hit','7 ns','14 seconds',1.15],['main memory','100 ns','3 minutes',2.3],['SSD random read','150 µs','3.5 days',5.48],['disk seek','10 ms','7.7 months',7.3]];
+  function build(){if(built)return;built=true;$('#ltBars').innerHTML=R.map(([n,t,h,l],i)=>`<div class="lb" style="left:0;top:${i*100+12}px;font-size:28px">${n}<small>${t}</small></div><div class="bar8" id="lb${i}" style="left:300px;top:${i*100+10}px;width:0;background:${i<2?'var(--teal)':i<3?'var(--gold)':'#ff6b6b'}"></div><div class="lb mono" id="lt${i}" style="left:320px;top:${i*100+18}px;font-size:28px;color:#fff;opacity:0;transition:opacity .5s">${h}</div>`).join('');}
+  return {step(b,e){build();R.forEach(([,,,l],i)=>{const w=Math.max(14,(l+0.15)/7.45*1050);const bar=$('#lb'+i),t=$('#lt'+i);
+      const set=()=>{bar.style.width=w+'px';t.style.left=(300+w+20)+'px';t.style.opacity=1;};
+      if(STATIC()||!e||b>0){bar.style.transition='none';set();}else{bar.style.transition='width 1.2s var(--ease)';bar.style.width='0';t.style.opacity=0;addT('lt',setTimeout(set,300+i*450));}});},leave(){clearT('lt');}};})();
+
+/* ---------- 3. locality: 32 ints, two lines ---------- */
+const Loc8=(()=>{let built=false;
+  function build(){if(built)return;built=true;$('#lcLine').innerHTML=Array.from({length:32},(_,i)=>`<i id="lc${i}">${i}</i>`).join('');}
+  const paint=n=>{for(let i=0;i<32;i++)$('#lc'+i).className=i<n?(i%16===0?'miss':'hit'):'';};
+  return {step(b,e){build();clearT('lc');cur8('locality',b===0?[]:[1,2]);
+    if(b<1){paint(0);$('#lcCap').innerHTML='';return;}
+    $('#lcCap').innerHTML='<span class="r">2 misses</span> · <span class="teal">30 hits</span> · hit rate 94%';
+    if(STATIC()||b>1||e){paint(32);return;}paint(0);for(let k=1;k<=32;k++)addT('lc',setTimeout(()=>paint(k),k*70));},leave(){clearT('lc');}};})();
+
+/* ---------- 4. effective access time ---------- */
+const Eat8={step(b){$('#eaA').innerHTML=b>=1?'99% × 2 = 1.98':'';$('#eaB').innerHTML=b>=2?'+ 1% × (2 + 4) = 0.06':'';$('#eaC').innerHTML=b>=3?'= 2.04 cycles':'';}};
+
+/* ---------- 5. two levels, bottom up ---------- */
+const Two8={step(b){$('#tvL2t').textContent=b>=1?'T = 4':'T = ?';$('#tvL1t').textContent=b>=2?'T = 3':'T = ?';
+  const L2=$('#tvL2').classList,L1=$('#tvL1').classList;L2.toggle('g',b>=1);L2.toggle('lit',b===1);L1.toggle('t',b>=2);L1.toggle('lit',b>=2);
+  $('#tvA').innerHTML=b>=1?'T(L2) = ½ × 2 + ½ × (2 + 4) = 1 + 3 = <span class="gold">4</span>':'';
+  $('#tvB').innerHTML=b>=2?'T(L1) = ½ × 1 + ½ × (1 + 4) = ½ + 5/2 = <span class="gold">3</span>':'';}};
+
+/* ---------- 8. a TLB lookup ---------- */
+const Tlb8={step(b){const S=[[2,0,'hit → physical page <span class="gold">1</span>',''],[5,-1,'<span class="r">miss</span> → walk the page table → frame 7','not in the TLB: the hardware walks the page table'],[5,2,'hit → physical page <span class="gold">7</span>','page 5 → frame 7 replaced the entry for page 0'],[5,2,'hit → physical page <span class="gold">7</span>','']][b];
+  $('#txVa').innerHTML=`<div class="f t"><b>${S[0]}</b><span>virtual page</span></div>`;
+  $$('#txTab tr').forEach(r=>r.classList.toggle('hit',r.dataset.s!==undefined&&+r.dataset.s===S[1]));
+  $('#txV2').textContent=b>=2?'5':'0';$('#txP2').textContent=b>=2?'7':'4';$('#txRes').innerHTML=S[2];$('#txCap').innerHTML=S[3];}};
+
+/* ---------- 10. address-space tags ---------- */
+const Sw8={step(b){$('#swA1').textContent=b>=1?'A':'–';$('#swA2').textContent=b>=1?'A':'–';}};
+
+/* ---------- 11. LRU on three slots ---------- */
+const Lru8=(()=>{const SEQ=['A','B','C','A','D'];let built=false;
+  function build(){if(built)return;built=true;$('#lrSlots').innerHTML=[0,1,2].map(i=>`<div class="slot8" id="lr${i}" style="left:${i*180}px;top:0"></div>`).join('');}
+  const ST=[[[],-1,''],[['A','B','C'],2,'A, B, C: three compulsory misses; the cache is full'],[['A','B','C'],3,'A again: a <span class="teal">hit</span>; A is now the most recent'],[['A','D','C'],4,'D: a <span class="r">miss</span>; the least recently used is B, so B leaves'],[['A','D','C'],4,''],[['A','D','C'],4,'']];
+  return {step(b){build();const [s,k,c]=ST[b];$('#lrSeq').innerHTML=SEQ.map((x,i)=>`<span style="color:${i===k?'var(--gold)':i<k?'#fff':'var(--mute)'}">${x}</span>`).join(' ');
+    [0,1,2].forEach(i=>{const e=$('#lr'+i);e.innerHTML=(s[i]||'')+`<small>slot ${i}</small>`;e.className='slot8'+(b===2&&s[i]==='A'||b>=3&&s[i]==='D'?' fast':'');});$('#lrCap').innerHTML=c;}};})();
+
+/* ---------- 12. write-through vs write-back: x = 1, 2, 3 ---------- */
+const Wr8=(()=>{let built=false;
+  const panel=(id,k)=>`<div class="box6 t" style="left:0;top:0;width:300px;height:110px">cache<small id="${k}c">x = ?</small></div><div class="box6" style="left:440px;top:0;width:300px;height:110px">memory<small id="${k}m">x = 0</small></div><div class="lb" id="${k}n" style="left:0;top:160px;font-size:30px">trips to memory: 0</div><svg class="abs" style="left:0;top:0" width="780" height="300"><path class="arr6 g" d="M 304 55 L 434 55" marker-end="url(#a8G)" id="${k}a" style="opacity:0;transition:opacity .2s"/></svg>`;
+  function build(){if(built)return;built=true;$('#wrT').innerHTML=panel('wrT','wt');$('#wrB').innerHTML=panel('wrB','wb');}
+  const set=(k,c,m,n,a)=>{$('#'+k+'c').textContent='x = '+c;$('#'+k+'m').textContent='x = '+m;$('#'+k+'n').textContent='trips to memory: '+n;$('#'+k+'a').style.opacity=a?1:0;};
+  return {step(b,e){build();clearT('wr');if(STATIC()||!e||b>0){set('wt',3,3,3,0);set('wb',3,3,1,0);return;}set('wt','?',0,0,0);set('wb','?',0,0,0);
+    [1,2,3].forEach((v,i)=>{addT('wr',setTimeout(()=>{set('wt',v,v,v,1);set('wb',v,0,0,0);},500+i*1100));addT('wr',setTimeout(()=>{$('#wta').style.opacity=0;},900+i*1100));});
+    addT('wr',setTimeout(()=>{set('wb',3,3,1,1);},4200));addT('wr',setTimeout(()=>{$('#wba').style.opacity=0;},4800));},leave(){clearT('wr');}};})();
+
+/* ---------- 13. the secret survives in the cache ---------- */
+const Sec8=(()=>{let built=false;
+  function build(){if(built)return;built=true;$('#scSlots').innerHTML=Array.from({length:16},(_,i)=>`<div class="slot8" id="sc${i}" style="left:${(i%8)*114}px;top:${Math.floor(i/8)*130}px;width:100px;height:100px;font-size:28px">${i}<small id="sct${i}"></small></div>`).join('');}
+  return {step(b){build();for(let i=0;i<16;i++){const s=$('#sc'+i);s.className='slot8'+(i===7&&b>=1?(b>=2?' fast':' g'):'');$('#sct'+i).textContent=b>=2?(i===7?'fast':'slow'):(i===7&&b>=1?'cached':'');}}};})();
+
+/* ---------- 14. Flush+Reload: one step per click ---------- */
+const Flush8=(()=>{let built=false;const S=5;
+  function build(){if(built)return;built=true;$('#flSlots').innerHTML=Array.from({length:8},(_,i)=>`<div class="slot8" id="fl${i}" style="left:${i*190}px;top:20px;width:170px">slot ${i}<small id="flt${i}"></small></div>`).join('')+`<div class="lb mono" style="left:1530px;top:44px;font-size:34px;color:var(--mute)">… 255</div>`;}
+  return {step(b){build();cur8('flush',[[],[0,1],[2],[3,4,5],[]][b]);
+    for(let i=0;i<8;i++){$('#fl'+i).className='slot8'+(b>=2&&b<3&&i===S?' g':b>=3&&i===S?' fast':'');$('#flt'+i).textContent=b>=3?(i===S?'fast: hit':'slow'):b>=1?(b>=2&&i===S?'touched':'flushed'):'';}
+    $('#flCap').innerHTML=['','every slot is out of the cache','the victim touched slot 5; we did not see it','one fast slot: the secret is <span class="gold">5</span>',''][b];}};})();
+
+/* ---------- 15. Meltdown ---------- */
+const Melt8={step(b){cur8('meltdown',[[0],[0,1],[1],[],[]][b]);$('#mdCheck').style.borderColor=b>=2?'var(--red)':'';
+  $('#mdCap').innerHTML=['the load needs kernel permission: it will fault','out of order: the CPU already read s and touched array[s × 4096] before the check finished','the check fails: the registers roll back, but the cache line for s stays; Flush+Reload reads s','',''][b];}};
+
+/* ---------- 16. Spectre ---------- */
+const Spec8={step(b){cur8('spectre',[[0,1],[0],[],[0,1],[],[]][b]);
+  $('#spTrain').innerHTML=b>=1?['x = 0','x = 1','x = 2','x = 3','…'].map((x,i)=>`<div class="slot8 fast" style="left:${i*170}px;top:0;width:150px;font-size:26px">${x}<small>taken</small></div>`).join('')+(b>=3?`<div class="slot8" style="left:900px;top:0;width:330px;font-size:26px;border-color:var(--red);color:var(--red)">x = huge<small>guessed: taken</small></div>`:''):'';
+  $('#spCap').innerHTML=['','1. train: call with small, valid x; the predictor learns "taken"','2. flush size and every array2 slot from the cache','3. a huge x: the CPU guesses "taken", reads the secret and touches array2[secret × 4096], then rolls back, but not the cache','',''][b];}};
+
+/* ---------- 17. the family since 2018 ---------- */
+const Var8=(()=>{let built=false;const E=[['Jan 2018','Meltdown','kernel memory'],['Jan 2018','Spectre','branch prediction'],['Aug 2018','Foreshadow','secure enclaves'],['May 2019','ZombieLoad','CPU buffers'],['Aug 2023','Downfall','vector gather']];
+  function build(){if(built)return;built=true;$('#vaLine').innerHTML=`<div style="position:absolute;left:0;right:0;top:150px;height:3px;background:#3a4a60"></div>`+E.map(([d,n,w],i)=>`<div class="box6${i<2?' g':''}" style="left:${i*340}px;top:200px;width:300px;height:130px">${n}<small>${d} · ${w}</small></div><div class="dot" style="left:${i*340+150}px;top:151px;opacity:1"></div>`).join('');}
+  return {step(){build();}};})();
+
+/* =====================================================================
+   PER-SCENE HOOKS (Lecture 8); each last build shows the takeaway
+   ===================================================================== */
+const CFG={
+  title:{builds:1,step(b,e){if(e)Title8.start();},leave(){Title8.stop();}},
+  latency:{builds:3,step(b,e){Lat8.step(b,e);},leave(){Lat8.leave();}},
+  locality:{builds:5,step(b,e){Loc8.step(b,e);},leave(){Loc8.leave();}},
+  eat:{builds:5,step(b){Eat8.step(b);}},
+  twolevel:{builds:4,step(b){Two8.step(b);}},
+  misses:{builds:3},
+  tlb:{builds:3},
+  tlbx:{builds:4,step(b){Tlb8.step(b);}},
+  assoc:{builds:3},
+  switch:{builds:3,step(b){Sw8.step(b);}},
+  lru:{builds:6,step(b){Lru8.step(b);}},
+  writes:{builds:3,step(b,e){Wr8.step(b,e);},leave(){Wr8.leave();}},
+  secret:{builds:4,step(b){Sec8.step(b);}},
+  flush:{builds:5,step(b){Flush8.step(b);}},
+  meltdown:{builds:5,step(b){Melt8.step(b);}},
+  spectre:{builds:6,step(b){Spec8.step(b);}},
+  variants:{builds:3,step(b){Var8.step(b);}},
+  end:{builds:2},
+};
+
+/* =====================================================================
+   DECK ENGINE (adapted from the Nov 2026 seminar deck)
+   ===================================================================== */
+const scenes=$$('.scene');
+let si=0,bi=0,prevSi=-1,clockStart=0;
+function builds(i){const c=CFG[scenes[i].dataset.id]||{};if(c.builds)return c.builds;return 1+Math.max(0,...$$('[data-b]',scenes[i]).map(e=>+e.dataset.b));}
+function render(){
+  const sc=scenes[si],c=CFG[sc.dataset.id]||{},entered=prevSi!==si;
+  if(entered&&prevSi>=0){const old=scenes[prevSi];const oc=CFG[old.dataset.id]||{};oc.leave&&oc.leave(old);old.classList.remove('active');$$('[data-b]',old).forEach(e=>e.classList.remove('on','past'));}
+  sc.classList.add('active');
+  const apply=()=>$$('[data-b]',sc).forEach(e=>{const b=+e.dataset.b,u=e.dataset.until!==undefined?+e.dataset.until:99;const on=b<=bi&&bi<=u;e.classList.toggle('on',on);e.classList.toggle('past',on&&e.hasAttribute('data-past')&&bi>b);});
+  if(entered&&!STATIC())requestAnimationFrame(()=>requestAnimationFrame(apply));else apply();
+  c.step&&c.step(bi,entered);
+  prevSi=si;
+  $('#hudL').textContent=sc.dataset.chapter||'';
+  $('#hudR').textContent=String(si+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0');
+  $('#prog').style.width=((si+(bi+1)/builds(si))/scenes.length*100)+'%';
+  try{history.replaceState(null,'',location.pathname+location.search+'#p'+(si+1)+'-'+bi);}catch(e){}
+  $('#nTitle').textContent=sc.dataset.title||'';$('#nPos').textContent='Page '+(si+1)+' · build '+(bi+1)+' of '+builds(si);
+  $('#nNext').textContent=si+1<scenes.length?'Next: '+scenes[si+1].dataset.title:'End';
+  const n=$('aside.notes',sc);$('#nBody').textContent=n?n.textContent.trim():'';
+  const z=$('aside.notes-zh',sc);$('#nZh').innerHTML=z?z.innerHTML.trim():'';
+}
+function next(){if(!clockStart)clockStart=Date.now();if(bi<builds(si)-1)bi++;else if(si<scenes.length-1){si++;bi=0;}render();}
+function prev(){if(bi>0)bi--;else if(si>0){si--;bi=builds(si)-1;}render();}
+function go(i,b=0){si=Math.max(0,Math.min(scenes.length-1,i));bi=Math.max(0,Math.min(builds(si)-1,b));render();}
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key;
+  if(k==='-'||k==='_'){e.preventDefault();setSafe(SAFE-0.02);return;}
+  if(k==='='||k==='+'){e.preventDefault();setSafe(SAFE+0.02);return;}
+  if(e.shiftKey&&(k==='ArrowUp'||k==='ArrowDown')){e.preventDefault();setShift(SHIFT+(k==='ArrowUp'?-10:10));return;}
+  if(k==='r'||k==='R'){SAFE=DEFSAFE;SHIFT=0;store('safe',SAFE);store('shift',0);fit();sizeMsg();return;}
+  if(/^[0-9]$/.test(k)){e.preventDefault();setJump((jump+k).replace(/^0+/,'').slice(-2));return;}
+  if(jump&&k==='Enter'){e.preventDefault();const n=+jump;setJump('');if(n>=1&&n<=scenes.length){showContents(false);go(n-1);}return;}
+  if(jump&&k==='Backspace'){e.preventDefault();setJump(jump.slice(0,-1));return;}
+  if(jump&&k==='Escape'){setJump('');return;}
+  if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){e.preventDefault();next();}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();prev();}
+  else if(k==='Home')go(0);else if(k==='End')go(scenes.length-1);
+  else if((k==='c'||k==='C')&&REHEARSAL){document.documentElement.classList.toggle('nozh');}
+  else if((k==='n'||k==='N')&&REHEARSAL){document.documentElement.classList.toggle('rehearse');fit();}
+  else if(k==='g'||k==='G')showContents();
+  else if(k==='Escape')showContents(false);
+  else if(k==='f'||k==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+});
+$('#stage').addEventListener('click',e=>{if(e.target.closest('a'))return;(e.clientX<window.innerWidth*0.18?prev:next)();});
+const CHAPTERS=(()=>{const out=[];scenes.forEach((s,i)=>{const c=s.dataset.chapter||'Opening';let g=out[out.length-1];if(!g||g.name!==c){g={name:c,pages:[]};out.push(g);}g.pages.push(i);});return out;})();
+$('#ovGrid').innerHTML=CHAPTERS.map(g=>`<div class="ovCol"><h4 data-i="${g.pages[0]}">${g.name}</h4><ol>`+
+  g.pages.map(i=>`<li data-i="${i}"><span class="p">${String(i+1).padStart(2,'0')}</span><span>${scenes[i].dataset.title}</span></li>`).join('')+'</ol></div>').join('');
+function showContents(on){const o=$('#overview');if(on===undefined)on=!o.classList.contains('show');o.classList.toggle('show',on);
+  if(on){$$('#ovGrid li').forEach(li=>li.classList.toggle('cur',+li.dataset.i===si));const c=$('#ovGrid li.cur');if(c)c.scrollIntoView({block:'center'});}}
+$('#ovGrid').addEventListener('click',e=>{const t=e.target.closest('[data-i]');if(t){showContents(false);go(+t.dataset.i);}});
+$('#hudR').addEventListener('click',e=>{e.stopPropagation();showContents(true);});
+let jump='',jumpT=0;
+function setJump(v){jump=v;const b=$('#jumpBox');clearTimeout(jumpT);
+  if(v){b.textContent='Go to page '+v+' · Enter';b.classList.add('show');jumpT=setTimeout(()=>setJump(''),4000);}else b.classList.remove('show');}
+setInterval(()=>{if(!clockStart)return;const s=Math.floor((Date.now()-clockStart)/1000);$('#nClock').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},500);
+setTimeout(()=>{$('#help').style.opacity=0;},6000);
+const MODE=document.documentElement.dataset.mode||'audience';
+const DEFSAFE=MODE==='projector'?0.92:1;
+const store=(k,v)=>{try{if(v===undefined)return localStorage.getItem('cop4610-l08_caching-'+MODE+'-'+k);localStorage.setItem('cop4610-l08_caching-'+MODE+'-'+k,v);}catch(e){return null;}};
+let SAFE=(()=>{const v=parseFloat(store('safe'));return v>=0.6&&v<=1?v:DEFSAFE;})();
+let SHIFT=(()=>{const v=parseFloat(store('shift'));return isFinite(v)?v:0;})();
+let sizeT=0;
+function sizeMsg(){const b=$('#sizeBox');b.textContent='Slide size '+Math.round(SAFE*100)+'%'+(SHIFT?' · moved '+(SHIFT<0?'up ':'down ')+Math.abs(SHIFT)+' px':'')+' · − / = size · Shift+↑↓ move · R reset';
+  b.classList.add('show');clearTimeout(sizeT);sizeT=setTimeout(()=>b.classList.remove('show'),3000);}
+function setSafe(v){SAFE=Math.round(Math.min(1,Math.max(0.6,v))*100)/100;store('safe',SAFE);fit();sizeMsg();}
+function setShift(v){SHIFT=Math.max(-300,Math.min(300,v));store('shift',SHIFT);fit();sizeMsg();}
+function fit(){const v=$('#viewport');const s=Math.min(v.clientWidth/1920,v.clientHeight/1080)*SAFE;$('#stage').style.transform='translateY('+SHIFT+'px) scale('+s+')';}
+const REHEARSAL=MODE==='rehearsal';
+if(REHEARSAL){document.documentElement.classList.add('rehearse');$('#help').textContent='→ next · ← back · N script · C 中文 · G index · number + Enter: go to page · F full screen';}
+if(/static/.test(location.search))document.documentElement.classList.add('static');
+window.addEventListener('resize',fit);document.addEventListener('fullscreenchange',()=>setTimeout(fit,50));fit();
+function fromHash(){const m=location.hash.match(/^#p?(\d+)(?:[.-](\d+))?/);if(m)go(+m[1]-1,+(m[2]||0));else go(0);}
+window.addEventListener('hashchange',fromHash);fromHash();
+</script>
+</body>
+</html>
