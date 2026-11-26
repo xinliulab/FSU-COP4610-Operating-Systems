@@ -39,7 +39,7 @@ For the current semester’s syllabus, schedule, and links to slides and code, s
 - **Primary textbook**: *Operating Systems: Three Easy Pieces* (OSTEP), a free online textbook by Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau. We are deeply grateful for making such a high-quality OS text freely available to students and instructors.  
   <http://ostep.org>
 
-- **Inspiration and open courseware**: Prof. **Yanyan Jiang** (Nanjing University). His excellent online OS course and publicly shared code examples greatly influenced the design of our in-class demos and the way we present state-machine thinking in OS education.  
+- **Lecture slides and demos**: Prof. **Yanyan Jiang** (Nanjing University). Many of our lecture slides and in-class demos are adapted and translated into English from his open *Operating Systems* course (<https://jyywiki.cn/>), including many of his figures and code examples. His course materials are licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). We thank him for his excellent open course, which also shaped the way we present state-machine thinking in OS education.  
   Instructor page: <https://ics.nju.edu.cn/~jyy/>; USENIX ATC “The Hitchhiker’s Guide to Operating Systems” <https://www.usenix.org/conference/atc23/presentation/jiang-yanyan>
 
 ## Intended audience
@@ -49,6 +49,7 @@ For the current semester’s syllabus, schedule, and links to slides and code, s
 ## License and fair use
 - Slides and code samples are provided for educational use in COP 4610.
 - Please retain attributions to OSTEP and Nanjing University materials when applicable, and follow the original licenses of any third-party content.
+- Material adapted from Prof. Jiang's course stays under CC BY-NC 4.0: keep the attribution and use it only for non-commercial purposes.
 
 ## Contact
 Instructor: **Dr. Xin Liu** · Office hours and course logistics are listed on the course website. 
