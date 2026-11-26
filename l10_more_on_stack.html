@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en" data-mode="audience">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COP 4610 Lecture 10 · More on Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04070d; --ink:#eef2f7; --ink2:#c3ccd8; --mute:#b3bdcb; --dim:#8592a6; --rule:#1d2938;
+  --teal:#3fe0c5; --teal-d:#1f9e8b; --gold:#e8bd62; --gold-d:#a8853e; --panel:#0c1420; --red:#ff6b6b;
+  --sans:"Bahnschrift","Barlow","DIN Alternate","DIN Next","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono","JetBrains Mono",Consolas,monospace;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;margin:-540px 0 0 -960px;background:var(--bg);overflow:hidden;transform-origin:50% 50%}
+
+/* ---------- scenes and builds ---------- */
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transform:scale(1.012);filter:blur(4px);
+  transition:opacity .9s var(--ease),transform 1.4s var(--ease),filter .9s var(--ease),visibility 0s linear .9s}
+.scene.active{opacity:1;visibility:visible;transform:none;filter:none;transition:opacity .9s var(--ease),transform 1.4s var(--ease),filter .9s var(--ease),visibility 0s}
+.abs{position:absolute}
+[data-b]{opacity:0;transform:translateY(22px);filter:blur(7px);
+  transition:opacity .5s var(--ease),transform .6s var(--ease),filter .5s var(--ease)}
+[data-b].on{opacity:1;transform:none;filter:none;
+  transition:opacity 1s var(--ease) var(--d,0s),transform 1.2s var(--ease) var(--d,0s),filter 1s var(--ease) var(--d,0s)}
+[data-b].on.past{opacity:.38}
+svg [data-b]{transform:translateY(10px)}
+svg [data-b].on{transform:none}
+.static *{transition:none!important;animation:none!important}
+
+/* ---------- type ---------- */
+.eyebrow{font-size:24px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.eyebrow.on{animation:track 1.6s var(--ease) both}
+@keyframes track{from{letter-spacing:.5em}to{letter-spacing:.22em}}
+.h1{font-size:104px;line-height:1.02;font-weight:600;letter-spacing:-.012em;margin:0;text-wrap:balance}
+.h2{font-size:68px;line-height:1.06;font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.h3{font-size:44px;line-height:1.15;font-weight:500;margin:0;text-wrap:balance}
+.lead{font-size:34px;line-height:1.36;font-weight:400;color:var(--ink2);text-wrap:pretty}
+.body{font-size:30px;line-height:1.42;color:var(--ink2);text-wrap:pretty}
+.small{font-size:23px;line-height:1.42;color:var(--mute);text-wrap:pretty}
+.label{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.cap{font-size:17px;letter-spacing:.04em;color:var(--dim)}
+.gold{color:var(--gold)} .teal{color:var(--teal)} .mute{color:var(--mute)} .white{color:#fff}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.mono{font-family:var(--mono)}
+.glow{text-shadow:0 0 38px rgba(232,189,98,.35)}
+b,strong{color:#fff;font-weight:600}
+code{font-family:var(--mono);font-size:.9em;color:var(--teal)}
+
+/* ---------- layout pieces ---------- */
+.top{left:120px;top:96px;width:1680px}
+.top .h2{margin-top:18px}
+.panel{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.085);border-radius:16px;padding:30px 34px}
+.panel .label{color:var(--gold);margin-bottom:14px}
+.list div{font-size:30px;line-height:1.38;color:var(--ink2);margin:0 0 16px 34px;position:relative;text-wrap:pretty}
+.list div::before{content:"";position:absolute;left:-30px;top:16px;width:9px;height:9px;background:var(--gold);transform:rotate(45deg)}
+.list.small-l div{font-size:26px}
+.term{font-family:var(--mono);background:#060b13;border:1px solid var(--rule);border-radius:12px;padding:22px 26px;font-size:24px;line-height:1.45;color:var(--ink2);white-space:pre;overflow:hidden}
+.term .pr{color:var(--teal)}
+.term .out{color:#fff}
+.hair{height:1px;background:var(--rule)}
+.grid2{display:grid;grid-template-columns:240px 1fr;column-gap:30px}
+.grid2>div{padding:18px 0;border-top:1px solid var(--rule)}
+.grid2 .k{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding-top:26px}
+.grid2 .v{font-size:28px;line-height:1.4;color:var(--ink2)}
+.pct{display:grid;grid-template-columns:1fr auto;row-gap:18px;font-size:30px;color:var(--ink2)}
+.pct .n{color:#fff;font-weight:600;text-align:right}
+.tbd{color:var(--red);border:1px dashed var(--red);border-radius:10px;padding:14px 20px;font-size:24px;line-height:1.35}
+.credit{font-size:17px;letter-spacing:.03em;color:var(--dim)}
+.credit a{color:var(--mute);text-decoration:none}
+a{color:var(--teal);text-decoration:none}
+
+/* ---------- photos ---------- */
+.photo{position:absolute;overflow:hidden;background:#0a1018;border-radius:10px}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.35) brightness(.62) contrast(1.15)}
+.photo.doc img{filter:invert(1) grayscale(1) sepia(.3) hue-rotate(128deg) saturate(1.3) brightness(.85) contrast(1.1)}
+.photo.dim img{filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.35) brightness(.42) contrast(1.35)}
+.photo::after{content:"";position:absolute;inset:0;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.pcap{position:absolute;font-size:18px;line-height:1.35;color:var(--mute);letter-spacing:.02em}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;left:0;right:0;bottom:0;height:56px;pointer-events:none;z-index:5}
+#hud .l{position:absolute;left:120px;bottom:24px;font-size:15px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+#hud .r{position:absolute;right:108px;bottom:14px;font-size:22px;font-weight:600;letter-spacing:.1em;color:var(--ink2);pointer-events:auto;cursor:pointer;padding:6px 14px;border:1px solid rgba(195,204,216,.35);border-radius:8px;background:rgba(10,16,26,.6)}
+#hud .r:hover{color:#fff;border-color:var(--gold)}
+#hud .r::before{content:"\2630  ";color:var(--gold);font-weight:400}
+#prog{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--teal-d),var(--gold));width:0;transition:width 1s var(--ease);opacity:.7}
+
+/* ---------- notes, contents, jump ---------- */
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;background:rgba(6,10,16,.97);border-top:1px solid #223;padding:18px 28px 22px;font:18px/1.55 var(--sans);color:#d7dee8;display:none;z-index:20}
+.rehearse #viewport{bottom:36vh}
+.rehearse #notes{display:block;height:36vh;max-height:none;font-size:25px;line-height:1.5;padding:20px 40px 26px}
+#notes .meta{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#7c8899;margin-bottom:10px;display:flex;gap:28px}
+#notes .meta b{color:var(--gold);font-weight:600}
+#nRow{display:block}
+#nZh{display:none}
+.rehearse #nRow{display:flex;gap:40px;align-items:flex-start}
+.rehearse #nBody{flex:1.15;min-width:0;white-space:pre-line}
+.rehearse #nZh{display:block;flex:1;min-width:0;font-size:21px;line-height:1.65;color:#b4c2d2;border-left:1px solid #26303d;padding-left:32px}
+.rehearse #nZh b{color:var(--gold);font-weight:600}
+.rehearse.nozh #nZh{display:none}
+aside.notes,aside.notes-zh{display:none}
+#overview{position:fixed;inset:0;background:#04070d;z-index:30;display:none;padding:clamp(18px,3vw,56px) clamp(16px,4vw,80px);overflow:auto;font-family:var(--sans)}
+#overview.show{display:block}
+.ovHead{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 28px;margin-bottom:clamp(18px,2.4vw,40px)}
+.ovT{font-weight:600;font-size:clamp(22px,2vw,36px);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.ovHint{font-size:clamp(13px,.95vw,17px);letter-spacing:.03em;color:var(--mute)}
+#ovGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:clamp(20px,2.4vw,44px)}
+.ovCol h4{margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid rgba(232,189,98,.4);cursor:pointer;font-weight:600;font-size:clamp(19px,1.5vw,28px);color:#fff}
+.ovCol h4:hover{color:var(--teal)}
+.ovCol ol{list-style:none;margin:0;padding:0}
+.ovCol li{display:flex;gap:12px;font-size:clamp(16px,1.08vw,21px);line-height:1.35;color:#c9d2de;padding:7px 8px;border-radius:8px;cursor:pointer}
+.ovCol li .p{flex:none;width:2.2em;color:var(--mute);font-variant-numeric:tabular-nums}
+.ovCol li:hover{color:#fff;background:rgba(63,224,197,.1)}
+.ovCol li.cur,.ovCol li.cur .p{color:var(--gold)}
+.ovCol li.cur{background:rgba(232,189,98,.14);font-weight:600}
+#jumpBox,#sizeBox{position:fixed;left:50%;top:5vh;transform:translateX(-50%);z-index:40;padding:.8vw 1.8vw;background:rgba(4,7,13,.94);border:1px solid rgba(232,189,98,.55);color:#fff;font:600 1.6vw var(--sans);letter-spacing:.06em;display:none;white-space:nowrap}
+#jumpBox.show,#sizeBox.show{display:block}
+#help{position:fixed;right:16px;top:12px;font:12px var(--sans);letter-spacing:.12em;color:#8592a6;z-index:10;user-select:none;transition:opacity 1s}
+
+/* ---------- title: live system-call flow ---------- */
+#flow text{font-family:var(--sans)}
+#flow .box{fill:rgba(255,255,255,.03);stroke:rgba(255,255,255,.12);stroke-width:1}
+#flow .band{fill:rgba(232,189,98,.05);stroke:rgba(232,189,98,.45);stroke-width:1}
+#flow .guide{stroke:#1d2938;stroke-width:1}
+#flow .lbl{font-size:26px;fill:#eef2f7;font-weight:500}
+#flow .hw{font-size:22px;fill:#8793a5;letter-spacing:.06em}
+#flow .tag{font-size:16px;fill:#4a5567;letter-spacing:.22em}
+#flow .sys{font-family:var(--mono);font-size:19px;fill:#3fe0c5}
+#flow .irq{font-size:15px;fill:#e8bd62;letter-spacing:.12em}
+
+/* ---------- token speed ---------- */
+.bar{height:14px;border-radius:7px;background:#0f1724;overflow:hidden;border:1px solid var(--rule)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal-d),var(--teal))}
+.bar.g i{background:linear-gradient(90deg,var(--gold-d),var(--gold))}
+
+/* ---------- agent trace ---------- */
+.stack{display:flex;flex-direction:column;gap:14px}
+.layer{border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.022);border-radius:14px;padding:16px 24px;transition:border-color .6s var(--ease),background .6s var(--ease)}
+.layer .ln{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);transition:color .6s}
+.layer .lv{font-size:26px;color:var(--ink2);margin-top:6px;font-family:var(--mono);min-height:34px}
+.layer.lit{border-color:rgba(63,224,197,.55);background:rgba(63,224,197,.06)}
+.layer.lit .ln{color:var(--teal)}
+.layer.os{border-color:rgba(232,189,98,.35)}
+.layer.os.lit{border-color:rgba(232,189,98,.8);background:rgba(232,189,98,.07)}
+.layer.os.lit .ln{color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.chip{font-family:var(--mono);font-size:22px;padding:4px 12px;border:1px solid #2b3a4d;border-radius:6px;color:#4a5567;transition:all .5s var(--ease)}
+.chip.lit{color:#fff;border-color:var(--gold);box-shadow:0 0 16px rgba(232,189,98,.35)}
+.chip.done{color:var(--ink2);border-color:#3a4a60}
+.steps .st{display:grid;grid-template-columns:56px 1fr;column-gap:10px;margin-bottom:18px}
+.steps .n{font-size:22px;color:var(--gold);font-weight:600;padding-top:5px;font-variant-numeric:tabular-nums}
+.steps .t{font-size:27px;line-height:1.35;color:var(--ink2)}
+.steps .lec{font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+
+/* ---------- logisim and pipe ---------- */
+#lgSvg text{font-family:var(--sans)}
+.seg{fill:#111a27;transition:fill .25s}
+.seg.on{fill:var(--gold);filter:drop-shadow(0 0 10px rgba(232,189,98,.55))}
+.bitbox{fill:rgba(255,255,255,.03);stroke:#2b3a4d}
+.bitbox.flash{stroke:var(--teal)}
+.ascii{font-family:var(--mono);font-size:21px;line-height:1.08;white-space:pre}
+.ascii .on{color:var(--red)}
+.ascii .off{color:#2a3442}
+
+/* ---------- software state machine ---------- */
+.code{font-family:var(--mono);font-size:30px;line-height:1.7;background:#060b13;border:1px solid var(--rule);border-radius:12px;padding:20px 26px 20px 20px}
+.code .row{display:grid;grid-template-columns:44px 40px 1fr;align-items:center;border-radius:6px;transition:background .4s}
+.code .row .ln{color:var(--dim);font-size:22px;text-align:right;padding-right:10px}
+.code .row .pc{color:var(--gold);opacity:0;transition:opacity .3s}
+.code .row.cur{background:rgba(232,189,98,.08)}
+.code .row.cur .pc{opacity:1}
+.code .kw{color:#c792ea} .code .ty{color:#82aaff} .code .st{color:#c3e88d} .code .nm{color:#f78c6c}
+.state{display:grid;grid-template-columns:auto 1fr;column-gap:30px;row-gap:12px;font-size:28px}
+.state .k{color:var(--mute);font-family:var(--mono)}
+.state .v{color:#fff;font-family:var(--mono)}
+.state .v.chg{color:var(--teal)}
+
+/* ---------- three bands ---------- */
+.bands{display:flex;flex-direction:column;gap:16px}
+.bands .bd{border:1px solid rgba(255,255,255,.085);border-radius:14px;padding:22px 28px;background:rgba(255,255,255,.022)}
+.bands .bd .label{margin-bottom:6px}
+.bands .bd .tx{font-size:26px;color:var(--ink2)}
+.bands .bd.os{border-color:rgba(232,189,98,.6);background:rgba(232,189,98,.06);box-shadow:0 0 40px rgba(232,189,98,.08)}
+.bands .bd.os .label{color:var(--gold)}
+
+/* ---------- history ---------- */
+.rail{left:120px;top:64px;width:1680px;height:40px}
+.rail .line{position:absolute;left:0;right:0;top:20px;height:1px;background:var(--rule)}
+.rail .tk{position:absolute;top:0;font-size:17px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);transform:translateX(-50%);padding-top:30px;white-space:nowrap}
+.rail .tk::before{content:"";position:absolute;left:50%;top:15px;width:9px;height:9px;margin-left:-5px;background:#24303f;transform:rotate(45deg)}
+.rail .tk.cur{color:var(--gold)}
+.rail .tk.cur::before{background:var(--gold);box-shadow:0 0 12px rgba(232,189,98,.6)}
+.era{left:120px;top:300px;width:1010px}
+.era .row{display:grid;grid-template-columns:200px 1fr;column-gap:30px;padding:22px 0;border-top:1px solid var(--rule)}
+.era .row .rl{font-size:18px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding-top:8px;line-height:1.4}
+.era .row .c div{font-size:27px;line-height:1.36;color:var(--ink2);margin-bottom:8px;text-wrap:pretty}
+.era .row.os{border-top:1px solid var(--gold-d)}
+.era .row.os .rl{color:var(--gold)}
+.era .row.os .c div{color:#fff}
+.ctss{font-family:var(--mono);font-size:20px;line-height:1.5;color:var(--mute);margin-top:6px}
+.ctss b{color:var(--teal);font-weight:500}
+.grow{left:120px;top:300px;width:1680px;height:640px;display:grid;grid-template-columns:repeat(5,1fr);column-gap:26px;align-items:end}
+.grow .col{display:flex;flex-direction:column;gap:10px}
+.grow .blk{border-radius:10px;border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.022);padding:12px 16px;font-size:21px;color:var(--mute);display:flex;flex-direction:column;justify-content:center}
+.grow .blk.os{border-color:rgba(232,189,98,.6);background:rgba(232,189,98,.07);color:#fff;font-size:22px;line-height:1.35}
+.grow .blk.os.none{border-style:dashed;border-color:#2b3a4d;background:none;color:var(--dim)}
+.grow .yr{font-size:20px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);text-align:center;margin-top:8px}
+.miles div{font-size:34px;line-height:1.3;color:var(--ink2);padding:16px 0;border-top:1px solid var(--rule)}
+.miles div:last-child{color:var(--gold)}
+
+/* ---------- two columns, four cards ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.four{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.four .panel .q{font-size:32px;line-height:1.3;color:#fff;font-weight:500}
+.four .panel .a{font-size:22px;line-height:1.4;color:var(--mute);margin-top:10px}
+.pq{font-size:30px;line-height:1.45;color:var(--ink2);border-left:2px solid var(--gold);padding:6px 0 6px 28px}
+.pq .src{display:block;font-size:20px;color:var(--mute);margin-top:12px}
+.ok{color:var(--teal)} .no{color:var(--red)}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+<style>
+/* ---------- v2: one moving picture per slide, a few label words ---------- */
+.full{position:absolute;inset:0;overflow:hidden}
+.full>img{width:100%;height:100%;object-fit:cover;display:block}
+.duo{filter:grayscale(1) sepia(.35) hue-rotate(128deg) saturate(1.3) brightness(.62) contrast(1.15)}
+.dimp{filter:brightness(.5) saturate(.85)}
+.kb{animation:kb 24s ease-in-out infinite alternate;transform-origin:50% 50%}
+@keyframes kb{from{transform:scale(1.03) translate(0,0)}to{transform:scale(1.16) translate(-2.5%,-1.5%)}}
+.static .kb{animation:none}
+.pc>img.prod{filter:brightness(.6) contrast(1.15) saturate(.9)}
+[data-id="every"] .pc>img{animation:kb 18s ease-in-out infinite alternate}
+.code .row.cur{background:rgba(232,189,98,.08)}
+.vig{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,7,13,.9) 0%,rgba(4,7,13,.15) 26%,rgba(4,7,13,.15) 70%,rgba(4,7,13,.92) 100%)}
+.vigL{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(4,7,13,.95) 0%,rgba(4,7,13,.7) 38%,rgba(4,7,13,0) 70%)}
+.ttl{position:absolute;left:120px;top:70px;width:1680px;font-size:62px;font-weight:600;line-height:1.08;letter-spacing:-.01em;text-wrap:balance;text-shadow:0 2px 24px rgba(0,0,0,.7)}
+.ttl .ey{display:block;font-size:22px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:600}
+.lb{position:absolute;font-size:32px;font-weight:600;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9);white-space:nowrap;line-height:1.2}
+.lb.g{color:var(--gold)} .lb.t{color:var(--teal)}
+.lb small{display:block;font-size:24px;font-weight:400;color:var(--ink2);margin-top:4px}
+.yr{position:absolute;font-size:150px;font-weight:300;line-height:1;color:var(--gold);letter-spacing:-.02em;text-shadow:0 0 40px rgba(232,189,98,.3)}
+.big{position:absolute;font-size:86px;font-weight:600;line-height:1.06;text-wrap:balance;text-shadow:0 2px 30px rgba(0,0,0,.8)}
+.cred{position:absolute;right:120px;bottom:62px;font-size:15px;line-height:1.4;color:var(--dim);text-align:right;max-width:1000px}
+.pc{position:absolute;border-radius:12px;overflow:hidden;background:#0a1018;box-shadow:0 18px 44px rgba(0,0,0,.55)}
+.pc>img{width:100%;height:100%;object-fit:cover;display:block}
+.pc .nm{position:absolute;left:0;right:0;bottom:0;padding:44px 18px 14px;background:linear-gradient(180deg,rgba(4,7,13,0),rgba(4,7,13,.92));font-size:24px;color:var(--ink2)}
+.pc .nm b{display:block;font-size:30px;color:#fff;font-weight:600}
+.pc .os{position:absolute;left:14px;top:14px;font-size:22px;font-weight:600;color:#04070d;background:var(--gold);border-radius:6px;padding:3px 10px;opacity:0;transform:scale(.6);transition:all .5s var(--ease)}
+.on .pc .os,.pc.on .os{opacity:1;transform:none}
+/* terminal */
+.tw{position:absolute;background:#060b13;border:1px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.tw .bar{height:46px;background:#0c1420;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:9px;padding:0 16px}
+.tw .bar i{width:12px;height:12px;border-radius:50%;background:#2b3a4d}
+.tw .bar span{margin-left:12px;font-size:22px;color:#dfe5ee;letter-spacing:.03em}
+.tw pre{margin:0;padding:22px 26px;font-family:var(--mono);font-size:24px;line-height:1.5;color:var(--ink2);white-space:pre-wrap}
+.tw .p{color:var(--teal)} .tw .w{color:#fff} .tw .gd{color:var(--gold)} .tw .k{color:#c792ea} .tw .s{color:#c3e88d} .tw .r{color:var(--red)}
+.cursor{display:inline-block;width:12px;height:26px;background:var(--teal);vertical-align:-4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* layered stacks (AI stack, OS model) */
+.band{position:absolute;border:1px solid rgba(255,255,255,.1);background:rgba(10,16,26,.82);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:600;color:var(--ink2);backdrop-filter:blur(4px)}
+.band.os{border-color:rgba(232,189,98,.75);color:var(--gold);background:rgba(28,22,10,.85);box-shadow:0 0 40px rgba(232,189,98,.12)}
+.band.lit{border-color:var(--teal);color:#fff;box-shadow:0 0 30px rgba(63,224,197,.25)}
+.dot{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--teal);box-shadow:0 0 18px var(--teal)}
+/* processes as circles (Core Dumped style) */
+.proc{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px solid var(--teal);background:rgba(63,224,197,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono);font-size:30px;color:#fff;transition:all .6s var(--ease)}
+.proc small{font-size:18px;color:var(--mute);margin-top:4px}
+.proc.g{border-color:var(--gold);background:rgba(232,189,98,.07)}
+.proc.dead{opacity:.15;transform:scale(.7)}
+.chip2{display:inline-block;font-family:var(--mono);font-size:26px;padding:6px 14px;margin:0 6px;border:1px solid #2b3a4d;border-radius:8px;color:#3a4a60;transition:all .45s var(--ease)}
+.chip2.lit{color:#fff;border-color:var(--gold);box-shadow:0 0 18px rgba(232,189,98,.4)}
+.chip2.done{color:var(--ink2);border-color:#3a4a60}
+/* htop-style cores */
+.cores{position:absolute;display:grid;grid-template-columns:1fr 1fr;column-gap:60px;row-gap:14px;font-family:var(--mono);font-size:24px}
+.core{display:grid;grid-template-columns:44px 1fr 90px;align-items:center;column-gap:12px;color:var(--mute)}
+.core .bar2{height:22px;background:#0f1724;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.core .bar2 i{display:block;height:100%;width:2%;background:linear-gradient(90deg,#3fe07a,#e8bd62 70%,#ff6b6b);transition:width .6s var(--ease)}
+.core .pct2{text-align:right;color:var(--ink2)}
+/* history extras */
+.tape{position:absolute;height:64px;background:#e9dcb8;opacity:.9;overflow:hidden;border-top:1px solid #b8a67a;border-bottom:1px solid #b8a67a}
+.tape .holes{position:absolute;top:0;left:0;height:100%;width:6000px;animation:tape 18s linear infinite;background-image:radial-gradient(circle,#04070d 0 6px,transparent 7px);background-size:28px 21px;background-position:0 0}
+@keyframes tape{from{transform:translateX(0)}to{transform:translateX(-2800px)}}
+.deck{position:absolute;width:150px;height:66px;border-radius:6px;background:#e9dcb8;box-shadow:0 6px 16px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;color:#3a3020;font-weight:600}
+.term4{position:absolute;width:200px;height:150px;margin:-75px 0 0 -100px;border-radius:12px;border:1px solid #2b3a4d;background:rgba(10,16,26,.85);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute);transition:all .3s}
+.term4.lit{border-color:var(--teal);color:#fff;box-shadow:0 0 28px rgba(63,224,197,.35)}
+.flowtxt{position:absolute;font-family:var(--mono);font-size:26px;color:var(--teal);white-space:nowrap}
+/* semester timeline and donut */
+.tline{position:absolute;height:2px;background:var(--rule)}
+.tick{position:absolute;width:2px;height:16px;background:#2b3a4d}
+.mark{position:absolute;transform:translateX(-50%);text-align:center;font-size:26px;color:#fff;white-space:nowrap}
+.mark::before{content:"";display:block;width:16px;height:16px;margin:0 auto 14px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 14px rgba(232,189,98,.5)}
+.mark small{display:block;font-size:22px;color:var(--mute);margin-top:4px}
+</style>
+<style>
+.deck-title {position:absolute;left:120px;top:105px;width:1700px}
+.deck-title .ey {font-size:22px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase}
+.deck-title h1 {font-size:72px;line-height:1.06;letter-spacing:-.035em;font-weight:650;margin:15px 0 0}
+.deck-title.cover h1 {font-size:102px}
+.deck-visual {position:absolute;inset:290px 120px 235px;display:flex;flex-direction:column;justify-content:center;gap:26px}
+.deck-visual.cover {top:320px}
+.tk {left:120px;top:895px;font-size:44px;max-width:1680px;line-height:1.12}
+.deck-credit {position:absolute;left:120px;top:985px;color:#b3bdcb;font-size:18px;letter-spacing:.025em}
+.deck-credit a {color:#cad7e6;text-decoration:underline;text-underline-offset:4px}
+.route {position:absolute;z-index:4;right:136px;top:34px;display:flex;gap:25px;align-items:flex-start;pointer-events:none}
+.route .st {display:flex;flex-direction:column;align-items:center;gap:9px}
+.route .w {font-size:19px;font-weight:600;color:#b3bdcb;white-space:nowrap}
+.route .st.cur .w {color:var(--gold)}
+.route .ds {display:flex;gap:6px;height:12px;align-items:center}
+.route .ds i {display:block;position:relative;width:6px;height:6px;border-radius:50%;background:#73839a}
+.route .ds i.m {width:9px;height:9px;background:#b9a078}
+.route .ds i.on {width:11px;height:11px;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.route .ds i .dr {position:absolute;left:50%;top:100%;width:1px;height:15px;background:var(--gold)}
+.route .ds i .sub {position:absolute;left:50%;top:calc(100% + 16px);transform:translateX(-50%);font-size:18px;font-weight:600;font-style:normal;color:var(--gold);white-space:nowrap}
+.trace {display:flex;align-items:center;gap:68px;width:100%}
+.trace>.codewin {flex:0 0 56%;min-width:0}
+.trace>.state {flex:1;min-width:0}
+.state {position:relative;min-height:440px;display:grid;grid-template-columns:minmax(0,1fr);gap:0;align-items:center}
+.state>.snapshot {grid-area:1 / 1;pointer-events:none}
+.state>.snapshot:not(.on) {visibility:hidden}
+.wide-state {min-height:465px}
+.codewin {background:#09111c;border:1px solid #304157;border-radius:15px;overflow:hidden;box-shadow:0 22px 60px #0008}
+.codewin .codehead {background:#101a28;padding:14px 24px;border-bottom:1px solid #2b3a4d;font-size:22px;font-weight:600;color:#c9d4e4;display:flex;justify-content:space-between}
+.codewin .codehead span {font-family:var(--mono);font-size:19px;color:#b3bdcb}
+.codewin .codelines {display:block;padding:16px 0;font:27px/1.44 var(--mono);color:#e8eff9}
+.codewin.compact .codelines {font-size:25px;line-height:1.35}
+.codewin .cline {display:block;white-space:pre;padding:0 22px 0 19px;border-left:5px solid transparent;transition:background .35s,border-color .35s,color .35s}
+.codewin .cline.is-current {border-color:var(--gold);background:#e8bd6217;color:#fff}
+.codewin .cline .ln {display:inline-block;width:43px;margin-right:10px;text-align:right;color:#a9bad0;font-size:.73em;user-select:none}
+.asm {font:28px/1.5 var(--mono);color:#eef2f7}
+.state-label {text-transform:uppercase;color:#c4d2e5;letter-spacing:.17em;font-weight:650;font-size:20px;margin:0 0 15px}
+.regs {display:grid;gap:12px}
+.regrow {display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:66px;padding:10px 24px;border:1px solid #304157;border-radius:9px;background:#0a1420;color:#eaf2ff;font:25px var(--mono)}
+.regrow b {color:inherit;font:600 26px var(--mono);text-align:right}
+.regrow.teal,.chip.teal,.byte.teal {border-color:#3fe0c598;color:var(--teal);background:#0b262a}
+.regrow.gold,.chip.gold,.byte.gold {border-color:#e8bd6298;color:var(--gold);background:#221d14}
+.regrow.bad,.chip.bad,.byte.bad {border-color:#fb879798;color:#fb9aaa;background:#281822}
+.regrow.quiet {color:#bcc9db;background:#09121d}
+.trace-detail {color:#c3d1e4;font-size:28px;line-height:1.18;margin:24px 0 0}
+.flow {width:100%;display:flex;align-items:center;gap:20px}
+.flow .chip {flex:1}
+.chip {min-width:0;min-height:125px;border:1px solid #34465c;background:#0b1420;border-radius:12px;display:grid;align-content:center;text-align:center;padding:14px 18px;color:#eef2f7;font-family:var(--sans)}
+.chip strong {font-size:35px;color:inherit}
+.chip small {font-size:23px;color:#bccbdd;margin-top:8px}
+.connector {min-width:44px;flex:0 0 44px;height:2px;background:#798da5;position:relative}
+.connector::after {content:"";position:absolute;right:0;width:12px;height:12px;border-top:2px solid #798da5;border-right:2px solid #798da5;transform:translateY(-5px) rotate(45deg)}
+.wide-state .flow + .trace-detail {text-align:center}
+.mem {display:flex;align-items:stretch;gap:10px}
+.byte {flex:1;display:grid;place-content:center;justify-items:center;gap:16px;min-height:110px;border:1px solid #34465c;background:#0c1724;border-radius:9px;font:36px var(--mono);color:#e9f1fb}
+.byte small {font:19px var(--mono);color:#c2d0e2}
+.byte {position:relative}
+.byte.zone {border:2px dashed #7d8fa5;background:#0a111a;color:#bcc9dc}
+.bigmem .byte {height:168px;font-size:53px}
+.deck-visual.cover .chip {min-height:170px}
+.deck-visual.cover .chip strong {font-size:40px}
+.matrix {border-collapse:collapse;width:100%;font-size:30px;text-align:left}
+.matrix th,.matrix td {padding:16px 24px;border-bottom:1px solid #334459}
+.matrix th {color:#bfcce0;font-size:22px;letter-spacing:.06em}
+.matrix td:first-child {font-weight:650}
+.matrix td {color:#e4edfa}
+.matrix .selected td {color:var(--teal);background:#0b2228}
+.out {font:28px/1.48 var(--mono);color:#eaf2ff;background:#09111c;border:1px solid #304157;border-radius:13px;padding:24px 28px;white-space:pre;overflow:hidden}
+.out .prompt {color:var(--teal)}
+.center {text-align:center}
+.roomline {margin:0 0 20px;color:#c9d8e9;font-size:28px}
+.viz-moving {animation:active-outline .65s var(--ease) 1}
+@keyframes active-outline {from {transform:translateX(-9px);opacity:.45} to {transform:translateX(0);opacity:1}}
+.lab-controls {display:flex;gap:14px;margin-bottom:8px}
+.lab-controls button {appearance:none;background:#0a1420;border:1px solid #34465c;color:#dce8f9;border-radius:9px;font:600 23px var(--mono);padding:10px 24px;cursor:pointer}
+.lab-controls button[aria-pressed="true"] {border-color:var(--gold);color:var(--gold);background:#221d14}
+.lab-controls button:focus-visible {outline:3px solid var(--teal);outline-offset:5px}
+.lab-sample .regrow b {white-space:pre}
+</style>
+
+<section class="scene" data-id="title" data-title="More on stack" data-chapter="">
+  <div class="deck-title cover"><div class="ey">10 / COP 4610 OPERATING SYSTEMS</div><h1>More on stack</h1></div>
+  <div class="deck-visual cover"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip teal"><strong>Input</strong><small>bytes and a length</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Local buffer</strong><small>finite capacity</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Return</strong><small>caller resumes</small></div></div></div><div class="snapshot" data-b="1"><div class="flow"><div class="chip"><strong>Input</strong><small>bytes and a length</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Local buffer</strong><small>check before copying</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>Return</strong><small>caller resumes</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="1">A length check protects the frame before the first write.</div>
+  <div class="deck-credit">Adapted from Yanyan Jiang, <a href="https://jyywiki.cn/OS/2026/">Operating Systems</a>, Nanjing University, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></div>
+</section>
+
+<section class="scene" data-id="boundary" data-title="The array ends at index 4" data-chapter="Bounds">
+  <div class="deck-title"><div class="ey">Bounds</div><h1>The array ends at index 4</h1></div>
+  <div class="route" data-t="1" data-sub="Array boundary"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">char label[5]</div><div class="mem bigmem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div><div class="byte zone">│<small>outside</small></div></div><p class="trace-detail">The five solid cells belong to label.</p></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">char label[5]</div><div class="mem bigmem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte teal">✓<small>4</small></div><div class="byte zone">│<small>outside</small></div></div><p class="trace-detail">Index 4 is the last cell.</p></div><div class="snapshot" data-b="2"><div class="state-label">char label[5]</div><div class="mem bigmem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div><div class="byte zone">5<small>outside</small></div></div><p class="trace-detail">Index 5 is outside this object.</p></div></div></div>
+  <div class="lb g tk" data-b="3">A mapped page can contain several separate C objects.</div>
+  <div class="deck-credit">Source: COP 4610, Lecture 9 Beamer</div>
+</section>
+
+<section class="scene" data-id="terminator" data-title="A C string needs one more byte" data-chapter="Bounds">
+  <div class="deck-title"><div class="ey">Bounds</div><h1>A C string needs one more byte</h1></div>
+  <div class="route" data-t="1" data-sub="String terminator"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">Four data bytes</div><div class="mem bigmem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte">·<small>4</small></div><div class="byte zone">│<small>outside</small></div></div><p class="trace-detail">Which cell holds the string terminator?</p></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">Four data bytes plus the terminator</div><div class="mem bigmem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte gold">\0<small>4</small></div><div class="byte zone">│<small>outside</small></div></div><p class="trace-detail">Five bytes fit.</p></div><div class="snapshot" data-b="2"><div class="state-label">Five data bytes</div><div class="mem bigmem"><div class="byte">S<small>0</small></div><div class="byte">T<small>1</small></div><div class="byte">A<small>2</small></div><div class="byte">C<small>3</small></div><div class="byte">K<small>4</small></div><div class="byte zone">│<small>outside</small></div></div><p class="trace-detail">There is no room for the terminator.</p></div></div></div>
+  <div class="lb g tk" data-b="3">Five bytes of capacity hold four characters plus the terminator.</div>
+</section>
+
+<section class="scene" data-id="accept" data-title="Four bytes pass the check" data-chapter="Prevention">
+  <div class="deck-title"><div class="ey">Prevention</div><h1>Four bytes pass the check</h1></div>
+  <div class="route" data-t="2" data-sub="Accept path"></div>
+  <div class="deck-visual"><div class="trace"><div class="codewin compact"><div class="codehead">label.c<span>C · copy_label(&quot;OS27&quot;, 4)</span></div><div class="codelines"><div class="cline"><span class="ln">5</span>static bool copy_label(const char *src, size_t n)</div><div class="cline"><span class="ln">6</span>{</div><div class="cline" data-hot="0"><span class="ln">7</span>    char label[5];</div><div class="cline" data-hot="1"><span class="ln">8</span>    if (n &gt;= sizeof label)</div><div class="cline"><span class="ln">9</span>        return false;</div><div class="cline" data-hot="2"><span class="ln">10</span>    memcpy(label, src, n);</div><div class="cline" data-hot="3"><span class="ln">11</span>    label[n] = &#x27;\0&#x27;;</div><div class="cline" data-hot="4"><span class="ln">12</span>    puts(label);</div><div class="cline" data-hot="5,6"><span class="ln">13</span>    return true;</div><div class="cline"><span class="ln">14</span>}</div><div class="cline"><span class="ln">15</span> </div></div></div><div class="state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">label · 5 bytes</div><div class="mem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">Reserve space for the local array.</p></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">4 &gt;= 5 is false</div><div class="mem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">The input has room for a terminator.</p></div><div class="snapshot" data-b="2" data-until="2"><div class="state-label">After memcpy</div><div class="mem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">Copy exactly four data bytes.</p></div><div class="snapshot" data-b="3" data-until="3"><div class="state-label">After label[n] = 0</div><div class="mem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte gold">\0<small>4</small></div></div><p class="trace-detail">Write the terminator at index 4.</p></div><div class="snapshot" data-b="4" data-until="4"><div class="state-label">stdout</div><div class="mem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte gold">\0<small>4</small></div></div><p class="trace-detail">n=4: OS27</p></div><div class="snapshot" data-b="5"><div class="state-label">Return true</div><div class="mem"><div class="byte teal">O<small>0</small></div><div class="byte teal">S<small>1</small></div><div class="byte teal">2<small>2</small></div><div class="byte teal">7<small>3</small></div><div class="byte gold">\0<small>4</small></div></div><p class="trace-detail">The caller sees a successful copy.</p></div></div></div></div>
+  <div class="lb g tk" data-b="6">The copy and the terminator both stay inside label.</div>
+</section>
+
+<section class="scene" data-id="reject" data-title="Five bytes take the rejection path" data-chapter="Prevention">
+  <div class="deck-title"><div class="ey">Prevention</div><h1>Five bytes take the rejection path</h1></div>
+  <div class="route" data-t="2" data-sub="Reject path"></div>
+  <div class="deck-visual"><div class="trace"><div class="codewin compact"><div class="codehead">label.c<span>C · copy_label(&quot;STACK&quot;, 5)</span></div><div class="codelines"><div class="cline"><span class="ln">5</span>static bool copy_label(const char *src, size_t n)</div><div class="cline"><span class="ln">6</span>{</div><div class="cline" data-hot="0"><span class="ln">7</span>    char label[5];</div><div class="cline" data-hot="1"><span class="ln">8</span>    if (n &gt;= sizeof label)</div><div class="cline" data-hot="2,3"><span class="ln">9</span>        return false;</div><div class="cline"><span class="ln">10</span>    memcpy(label, src, n);</div><div class="cline"><span class="ln">11</span>    label[n] = &#x27;\0&#x27;;</div><div class="cline"><span class="ln">12</span>    puts(label);</div><div class="cline"><span class="ln">13</span>    return true;</div><div class="cline"><span class="ln">14</span>}</div><div class="cline"><span class="ln">15</span> </div></div></div><div class="state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">label · 5 bytes</div><div class="mem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">The input has five data bytes.</p></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">5 &gt;= 5 is true</div><div class="mem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">The string would need six bytes.</p></div><div class="snapshot" data-b="2"><div class="state-label">Return false</div><div class="mem"><div class="byte">·<small>0</small></div><div class="byte">·<small>1</small></div><div class="byte">·<small>2</small></div><div class="byte">·<small>3</small></div><div class="byte">·<small>4</small></div></div><p class="trace-detail">stdout from the test driver: n=5: rejected</p></div></div></div></div>
+  <div class="lb g tk" data-b="3">The function returns before writing a single byte to label.</div>
+</section>
+
+<section class="scene" data-id="interface" data-title="The length belongs in the interface" data-chapter="Prevention">
+  <div class="deck-title"><div class="ey">Prevention</div><h1>The length belongs in the interface</h1></div>
+  <div class="route" data-t="2" data-sub="Input contract"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip teal"><strong>src</strong><small>first readable source byte</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>n</strong><small>number of readable bytes</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>label[5]</strong><small>destination capacity</small></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="flow"><div class="chip"><strong>src</strong><small>first readable source byte</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>n</strong><small>number of readable bytes</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>label[5]</strong><small>destination capacity</small></div></div></div><div class="snapshot" data-b="2"><div class="flow"><div class="chip teal"><strong>src</strong><small>source range is valid</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>n &lt; 5</strong><small>space for data and zero</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>label[5]</strong><small>bounded write</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="3">The caller supplies a readable source and the callee checks the destination.</div>
+</section>
+
+<section class="scene" data-id="corruption" data-title="A stack buffer overflow can corrupt state" data-chapter="Mitigations">
+  <div class="deck-title"><div class="ey">Mitigations</div><h1>A stack buffer overflow can corrupt state</h1></div>
+  <div class="route" data-t="3" data-sub="Memory corruption"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip"><strong>Input</strong><small>data arrives</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>C object</strong><small>a bounded destination</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Adjacent state</strong><small>layout depends on the build</small></div></div></div><div class="snapshot" data-b="1"><div class="flow"><div class="chip bad"><strong>Bounds error</strong><small>write crosses an object boundary</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Adjacent state</strong><small>may change unexpectedly</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Later use</strong><small>wrong result, crash, or control-flow change</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="2">The symptom may appear well after the write that caused it.</div>
+  <div class="deck-credit">Source: COP 4610, Lecture 9 Beamer</div>
+</section>
+
+<section class="scene" data-id="canary" data-title="A canary checks the frame before return" data-chapter="Mitigations">
+  <div class="deck-title"><div class="ey">Mitigations</div><h1>A canary checks the frame before return</h1></div>
+  <div class="route" data-t="3" data-sub="Stack protector"></div>
+  <div class="deck-visual"><div class="trace"><div class="codewin compact"><div class="codehead">Stack-protector logic<span>Pseudocode · two outcomes</span></div><div class="codelines"><div class="cline" data-hot="0"><span class="ln">1</span>guard = read_runtime_guard()</div><div class="cline" data-hot="1"><span class="ln">2</span>frame_guard = guard</div><div class="cline" data-hot="2"><span class="ln">3</span>run_function_body()</div><div class="cline" data-hot="3"><span class="ln">4</span>if frame_guard != read_runtime_guard():</div><div class="cline" data-hot="4,5"><span class="ln">5</span>    stack_check_fail()</div><div class="cline"><span class="ln">6</span>return_to_caller()</div></div></div><div class="state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">Entry</div><div class="regs"><div class="regrow teal"><span>runtime guard</span><b>reference</b></div><div class="regrow"><span>frame guard</span><b>pending</b></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">Entry</div><div class="regs"><div class="regrow"><span>runtime guard</span><b>reference</b></div><div class="regrow teal"><span>frame guard</span><b>saved</b></div></div></div><div class="snapshot" data-b="2" data-until="2"><div class="state-label">Body</div><div class="regs"><div class="regrow"><span>frame guard</span><b>saved</b></div><div class="regrow teal"><span>copy_label</span><b>bounded copy</b></div></div></div><div class="snapshot" data-b="3" data-until="3"><div class="state-label">Ordinary exit</div><div class="regs"><div class="regrow teal"><span>guard comparison</span><b>match</b></div><div class="regrow"><span>next step</span><b>return to caller</b></div></div></div><div class="snapshot" data-b="4"><div class="state-label">Mismatch scenario</div><div class="regs"><div class="regrow bad"><span>guard comparison</span><b>mismatch</b></div><div class="regrow gold"><span>next step</span><b>terminate</b></div></div><p class="trace-detail">A changed guard is detected at the check.</p></div></div></div></div>
+  <div class="lb g tk" data-b="5">The compiler checks the guard after the body has run.</div>
+  <div class="deck-credit">Source: COP 4610 Lecture 9 Beamer and Clang stack-protector output for label.c</div>
+</section>
+
+<section class="scene" data-id="nx" data-title="A writable page can deny instruction fetch" data-chapter="Mitigations">
+  <div class="deck-title"><div class="ey">Mitigations</div><h1>A writable page can deny instruction fetch</h1></div>
+  <div class="route" data-t="3" data-sub="Execute permission"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><table class="matrix"><thead><tr><th scope="col">Illustrative page</th><th scope="col">Read data</th><th scope="col">Write data</th><th scope="col">Fetch instructions</th></tr></thead><tbody><tr class="selected"><td>Code</td><td>allowed</td><td>denied</td><td>allowed</td></tr><tr><td>Stack</td><td>allowed</td><td>allowed</td><td>denied</td></tr></tbody></table></div><div class="snapshot" data-b="1" data-until="1"><table class="matrix"><thead><tr><th scope="col">Illustrative page</th><th scope="col">Read data</th><th scope="col">Write data</th><th scope="col">Fetch instructions</th></tr></thead><tbody><tr><td>Code</td><td>allowed</td><td>denied</td><td>allowed</td></tr><tr class="selected"><td>Stack</td><td>allowed</td><td>allowed</td><td>denied</td></tr></tbody></table></div><div class="snapshot" data-b="2"><div class="flow"><div class="chip"><strong>CPU fetch</strong><small>current instruction address</small></div><i class="connector" aria-hidden="true"></i><div class="chip bad"><strong>Page permission</strong><small>execute denied</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Fault</strong><small>OS handles the exception</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="3">Non-executable memory blocks instruction fetches from data pages.</div>
+  <div class="deck-credit">Source: COP 4610, Lecture 9 Beamer</div>
+</section>
+
+<section class="scene" data-id="aslr" data-title="New processes can start at different addresses" data-chapter="Mitigations">
+  <div class="deck-title"><div class="ey">Mitigations</div><h1>New processes can start at different addresses</h1></div>
+  <div class="route" data-t="3" data-sub="Randomized layout"></div>
+  <div class="deck-visual"><div class="trace"><div class="codewin compact"><div class="codehead">layout.c<span>C · macOS sample</span></div><div class="codelines"><div class="cline" data-hot="0"><span class="ln">3</span>static int data;</div><div class="cline"><span class="ln">4</span> </div><div class="cline"><span class="ln">5</span>int main(void)</div><div class="cline"><span class="ln">6</span>{</div><div class="cline" data-hot="1"><span class="ln">7</span>    int local;</div><div class="cline" data-hot="2,3,4"><span class="ln">8</span>    printf(&quot;%p %p\n&quot;, (void *)&amp;data, (void *)&amp;local);</div><div class="cline"><span class="ln">9</span>}</div></div></div><div class="state"><div class="snapshot" data-b="0" data-until="0"><div class="state-label">Two regions</div><div class="regs"><div class="regrow teal"><span>data</span><b>static object</b></div><div class="regrow"><span>local</span><b>automatic object</b></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="state-label">Two regions</div><div class="regs"><div class="regrow"><span>data</span><b>static object</b></div><div class="regrow teal"><span>local</span><b>automatic object</b></div></div></div><div class="snapshot" data-b="2" data-until="2"><div class="state-label">Run 1 (baseline)</div><div class="regs"><div class="regrow"><span>global address</span><b>same</b></div><div class="regrow"><span>stack address</span><b>same</b></div></div></div><div class="snapshot" data-b="3"><div class="state-label">Compared with run 1</div><div class="regs"><div class="regrow teal"><span>run 2 · global</span><b>different</b></div><div class="regrow teal"><span>run 2 · stack</span><b>different</b></div><div class="regrow teal"><span>run 3 · global</span><b>different</b></div><div class="regrow teal"><span>run 3 · stack</span><b>different</b></div></div></div></div></div></div>
+  <div class="lb g tk" data-b="4">Address space layout randomization makes many locations less predictable.</div>
+  <div class="deck-credit">Source: local macOS run of layout.c + layout_runs.py</div>
+</section>
+
+<section class="scene" data-id="stages" data-title="Each layer checks a different event" data-chapter="Mitigations">
+  <div class="deck-title"><div class="ey">Mitigations</div><h1>Each layer checks a different event</h1></div>
+  <div class="route" data-t="3" data-sub="Layered defenses"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip teal"><strong>Copy</strong><small>check input length</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Return</strong><small>check saved guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Fetch</strong><small>check execute permission</small></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="flow"><div class="chip"><strong>Copy</strong><small>check input length</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Return</strong><small>check saved guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Fetch</strong><small>check execute permission</small></div></div></div><div class="snapshot" data-b="2" data-until="2"><div class="flow"><div class="chip"><strong>Copy</strong><small>check input length</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Return</strong><small>check saved guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>Fetch</strong><small>check execute permission</small></div></div></div><div class="snapshot" data-b="3"><div class="flow"><div class="chip"><strong>Compile</strong><small>insert selected frame checks</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Load</strong><small>choose randomized placements</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Run</strong><small>enforce page permissions</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="4">Bounds enforcement fixes the defect. Other layers limit consequences.</div>
+  <div class="deck-credit">Adapted from Yanyan Jiang, <a href="https://jyywiki.cn/OS/2026/">Operating Systems</a>, Nanjing University, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></div>
+</section>
+
+<section class="scene" data-id="cases" data-title="The most useful tests sit at the boundary" data-chapter="Testing">
+  <div class="deck-title"><div class="ey">Testing</div><h1>The most useful tests sit at the boundary</h1></div>
+  <div class="route" data-t="4" data-sub="Boundary tests"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><table class="matrix"><thead><tr><th scope="col">Input bytes</th><th scope="col">Bytes with NUL</th><th scope="col">Observed outcome</th></tr></thead><tbody><tr class="selected"><td>0</td><td>1</td><td>accepted · empty string</td></tr><tr><td>1</td><td>2</td><td>accepted · A</td></tr></tbody></table></div><div class="snapshot" data-b="1" data-until="1"><table class="matrix"><thead><tr><th scope="col">Input bytes</th><th scope="col">Bytes with NUL</th><th scope="col">Observed outcome</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>accepted · empty string</td></tr><tr><td>1</td><td>2</td><td>accepted · A</td></tr><tr class="selected"><td>4</td><td>5</td><td>accepted · OS27</td></tr></tbody></table></div><div class="snapshot" data-b="2"><table class="matrix"><thead><tr><th scope="col">Input bytes</th><th scope="col">Bytes with NUL</th><th scope="col">Observed outcome</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>accepted · empty string</td></tr><tr><td>1</td><td>2</td><td>accepted · A</td></tr><tr><td>4</td><td>5</td><td>accepted · OS27</td></tr><tr class="selected"><td>5</td><td>6</td><td>rejected</td></tr></tbody></table></div></div></div>
+  <div class="lb g tk" data-b="3">Test the largest input that fits and the first one that fails.</div>
+  <div class="deck-credit">Source: local run of label.c</div>
+</section>
+
+<section class="scene" data-id="practice" data-title="Which inputs fit this buffer?" data-chapter="Testing">
+  <div class="deck-title"><div class="ey">Testing</div><h1>Which inputs fit this buffer?</h1></div>
+  <div class="route" data-t="4" data-sub="Try a sample"></div>
+  <div class="deck-visual"><div class="trace"><div class="codewin compact"><div class="codehead">label.c<span>C · browser model</span></div><div class="codelines"><div class="cline"><span class="ln">5</span>static bool copy_label(const char *src, size_t n)</div><div class="cline"><span class="ln">6</span>{</div><div class="cline" data-hot="0"><span class="ln">7</span>    char label[5];</div><div class="cline" data-hot="1"><span class="ln">8</span>    if (n &gt;= sizeof label)</div><div class="cline"><span class="ln">9</span>        return false;</div><div class="cline" data-hot="2"><span class="ln">10</span>    memcpy(label, src, n);</div><div class="cline" data-hot="3,4"><span class="ln">11</span>    label[n] = &#x27;\0&#x27;;</div><div class="cline"><span class="ln">12</span>    puts(label);</div><div class="cline"><span class="ln">13</span>    return true;</div><div class="cline"><span class="ln">14</span>}</div><div class="cline"><span class="ln">15</span> </div></div></div><div class="state"><div class="snapshot" data-b="0"><div data-bounds-lab><div class="state-label">Choose an input</div><div class="lab-controls" role="group" aria-label="Sample strings"><button type="button" data-sample="" aria-pressed="false">Empty</button><button type="button" data-sample="A" aria-pressed="false">A</button><button type="button" data-sample="OS27" aria-pressed="true">OS27</button><button type="button" data-sample="STACK" aria-pressed="false">STACK</button></div><div class="regs lab-sample"><div class="regrow"><span>Input bytes</span><b data-lab-length>4</b></div><div class="regrow" aria-live="polite"><span>Check</span><b data-lab-status>pending</b></div></div><div style="margin-top:24px"><div class="state-label">Destination bytes</div><div class="mem"><div class="byte" data-lab-byte>·<small>0</small></div><div class="byte" data-lab-byte>·<small>1</small></div><div class="byte" data-lab-byte>·<small>2</small></div><div class="byte" data-lab-byte>·<small>3</small></div><div class="byte" data-lab-byte>·<small>4</small></div></div></div></div></div></div></div></div>
+  <div class="lb g tk" data-b="4">A rejected input leaves every destination byte unwritten.</div>
+</section>
+
+<section class="scene" data-id="asan" data-title="AddressSanitizer checks accesses during testing" data-chapter="Testing">
+  <div class="deck-title"><div class="ey">Testing</div><h1>AddressSanitizer checks accesses during testing</h1></div>
+  <div class="route" data-t="4" data-sub="Instrumented runs" data-br></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip teal"><strong>Test cases</strong><small>0, 1, 4, and 5 data bytes</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Instrumented build</strong><small>AddressSanitizer</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Test report</strong><small>watch the executed paths</small></div></div></div><div class="snapshot" data-b="1"><div class="out">$ clang -g -O1 -fsanitize=address label.c -o label_asan
+$ ./label_asan
+n=0:
+n=1: A
+n=4: OS27
+n=5: rejected</div></div></div></div>
+  <div class="lb g tk" data-b="2">A clean test run covers the paths those inputs exercised.</div>
+  <div class="deck-credit">Adapted from Yanyan Jiang, <a href="https://jyywiki.cn/OS/2026/">Operating Systems</a>, Nanjing University, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></div>
+</section>
+
+<section class="scene" data-id="diagnose" data-title="What would each symptom tell you?" data-chapter="Testing">
+  <div class="deck-title"><div class="ey">Testing</div><h1>What would each symptom tell you?</h1></div>
+  <div class="route" data-t="4" data-sub="Class check"></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip"><strong>Case A</strong><small>input rejected before copy</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case B</strong><small>guard mismatch at exit</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case C</strong><small>instruction fetch denied</small></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="flow"><div class="chip teal"><strong>Case A</strong><small>bounds check prevented the write</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case B</strong><small>guard mismatch at exit</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case C</strong><small>instruction fetch denied</small></div></div></div><div class="snapshot" data-b="2" data-until="2"><div class="flow"><div class="chip"><strong>Case A</strong><small>bounds check prevented the write</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Case B</strong><small>exit check detected damage</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case C</strong><small>instruction fetch denied</small></div></div></div><div class="snapshot" data-b="3"><div class="flow"><div class="chip"><strong>Case A</strong><small>bounds check prevented the write</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Case B</strong><small>exit check detected damage</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>Case C</strong><small>execute permission denied the fetch</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="4">The timing of the failure points to the mechanism.</div>
+</section>
+
+<section class="scene" data-id="summary" data-title="Keeping the call stack intact" data-chapter="">
+  <div class="deck-title"><div class="ey"></div><h1>Keeping the call stack intact</h1></div>
+  <div class="deck-visual"><div class="state wide-state"><div class="snapshot" data-b="0" data-until="0"><div class="flow"><div class="chip teal"><strong>Source</strong><small>check object bounds</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>Compiler</strong><small>check a frame guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>OS and CPU</strong><small>vary placement and enforce permissions</small></div></div></div><div class="snapshot" data-b="1" data-until="1"><div class="flow"><div class="chip"><strong>Source</strong><small>check object bounds</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Compiler</strong><small>check a frame guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip"><strong>OS and CPU</strong><small>vary placement and enforce permissions</small></div></div></div><div class="snapshot" data-b="2"><div class="flow"><div class="chip teal"><strong>Source</strong><small>check object bounds</small></div><i class="connector" aria-hidden="true"></i><div class="chip gold"><strong>Compiler</strong><small>check a frame guard</small></div><i class="connector" aria-hidden="true"></i><div class="chip teal"><strong>OS and CPU</strong><small>vary placement and enforce permissions</small></div></div></div></div></div>
+  <div class="lb g tk" data-b="2">Prevent invalid writes first and keep independent protections in place.</div>
+</section>
+
+  <div id="hud"><div class="l" id="hudL"></div><div class="r num" id="hudR"></div><div id="prog"></div></div>
+</div>
+</div>
+<div id="help">→ next · ← back · G index · number + Enter: go to page · F full screen</div>
+<div id="notes"><div class="meta"><b id="nTitle"></b><span id="nPos"></span><span id="nNext"></span><span id="nClock">00:00</span></div><div id="nRow"><div id="nBody"></div><div id="nZh"></div></div></div>
+<div id="overview"><div class="ovHead"><span class="ovT">Index</span><span class="ovHint">Tap a page to go there · Tap the page number on any slide to come back here · Type a page number, then Enter · Home: first page · G or Esc: close · − / = slide size · Shift+↑↓ move · R reset</span></div><div id="ovGrid"></div></div>
+<div id="jumpBox"></div>
+<div id="sizeBox"></div>
+
+<script>
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const SVGNS='http://www.w3.org/2000/svg';
+const mk=(tag,attrs,parent)=>{const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;};
+const STATIC=()=>document.documentElement.classList.contains('static');
+
+/* =====================================================================
+   v2 SCENE ANIMATIONS: every slide moves
+   ===================================================================== */
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const timers={};function clearT(k){(timers[k]||[]).forEach(t=>{clearTimeout(t);clearInterval(t);});timers[k]=[];}
+function addT(k,t){(timers[k]=timers[k]||[]).push(t);return t;}
+// type segments [[text,cls],...] into a <pre>, char by char; then call done
+function typeInto(k,el,segs,cps,done){clearT(k);el.innerHTML='';let i=0,j=0,html='';const step=()=>{
+  if(i>=segs.length){el.innerHTML=html;done&&done();return;}
+  const [t,c]=segs[i];const n=Math.max(1,Math.round(cps/60));const piece=t.slice(j,j+n);j+=n;
+  const cur=html+(c?`<span class="${c}">${esc(t.slice(0,j))}</span>`:esc(t.slice(0,j)));
+  el.innerHTML=cur+'<span class="cursor"></span>';
+  if(j>=t.length){html+=c?`<span class="${c}">${esc(t)}</span>`:esc(t);i++;j=0;}
+  addT(k,setTimeout(step,1000/60));};
+  if(STATIC()){el.innerHTML=segs.map(([t,c])=>c?`<span class="${c}">${esc(t)}</span>`:esc(t)).join('');done&&done();return;}
+  step();}
+
+const routeWords = ["Bounds", "Prevention", "Mitigations", "Testing"];
+const routeSections = $$('.route');
+const routeGroups = routeWords.map((_, index) =>
+  routeSections.filter(route => Number(route.dataset.t) === index + 1)
+);
+for (const route of routeSections) {
+  routeGroups.forEach((group, index) => {
+    const stop = document.createElement('div');
+    stop.className = group.includes(route) ? 'st cur' : 'st';
+    const word = document.createElement('div');
+    word.className = 'w';
+    word.textContent = routeWords[index];
+    const dots = document.createElement('div');
+    dots.className = 'ds';
+    for (const page of group) {
+      const dot = document.createElement('i');
+      dot.classList.toggle('m', !page.hasAttribute('data-br'));
+      if (page === route) {
+        dot.classList.add('on');
+        const rule = document.createElement('b');
+        rule.className = 'dr';
+        const label = document.createElement('span');
+        label.className = 'sub';
+        label.textContent = route.dataset.sub;
+        dot.append(rule, label);
+      }
+      dots.append(dot);
+    }
+    stop.append(word, dots);
+    route.append(stop);
+  });
+}
+
+function showBuild(id, build) {
+  const slide = $(`[data-id="${id}"]`);
+  slide.querySelectorAll('[data-hot]').forEach(line => {
+    line.classList.toggle('is-current', line.dataset.hot.split(',').includes(String(build)));
+  });
+  runBoundsLab(slide, build);
+}
+
+for (const lab of $$('[data-bounds-lab]')) {
+  lab.addEventListener('click', event => {
+    const sample = event.target.closest('button[data-sample]');
+    if (!sample) return;
+    event.stopPropagation();
+    for (const choice of $$('button[data-sample]', lab)) {
+      choice.setAttribute('aria-pressed', String(choice === sample));
+    }
+    showBuild('practice', Number(lab.dataset.step));
+  });
+  lab.addEventListener('keydown', event => {
+    if (event.target.closest('button') && [' ', 'Enter'].includes(event.key)) event.stopPropagation();
+  });
+}
+
+function runBoundsLab(slide, build) {
+  const lab = $('[data-bounds-lab]', slide);
+  if (!lab) return;
+  lab.dataset.step = build;
+  const active = $('button[aria-pressed="true"]', lab);
+  const bytes = new TextEncoder().encode(active.dataset.sample);
+  const cells = $$('[data-lab-byte]', lab);
+  const accepted = bytes.length < cells.length;
+  const classified = build >= 1;
+  const copied = build >= 2 && accepted;
+  const memory = new Uint8Array(cells.length);
+  if (copied) memory.set(bytes);
+  $('[data-lab-length]', lab).textContent = String(bytes.length);
+  $('[data-lab-status]', lab).textContent = classified ? (accepted ? 'fits' : 'rejected') : 'pending';
+  cells.forEach((cell, index) => {
+    const payload = copied && index < bytes.length;
+    const terminator = build >= 3 && copied && index === bytes.length;
+    cell.firstChild.nodeValue = payload ? String.fromCharCode(memory[index]) : (terminator ? 'NUL' : '·');
+    cell.classList.toggle('teal', payload);
+    cell.classList.toggle('gold', terminator);
+  });
+  if (build >= 2 && !accepted) {
+    slide.querySelectorAll('.is-current').forEach(current => current.classList.remove('is-current'));
+    $$('.cline', slide)[4].classList.add('is-current');
+  }
+}
+
+const CFG = {
+  "title": { builds: 2, step(build) { showBuild("title", build); } },
+  "boundary": { builds: 4, step(build) { showBuild("boundary", build); } },
+  "terminator": { builds: 4, step(build) { showBuild("terminator", build); } },
+  "accept": { builds: 7, step(build) { showBuild("accept", build); } },
+  "reject": { builds: 4, step(build) { showBuild("reject", build); } },
+  "interface": { builds: 4, step(build) { showBuild("interface", build); } },
+  "corruption": { builds: 3, step(build) { showBuild("corruption", build); } },
+  "canary": { builds: 6, step(build) { showBuild("canary", build); } },
+  "nx": { builds: 4, step(build) { showBuild("nx", build); } },
+  "aslr": { builds: 5, step(build) { showBuild("aslr", build); } },
+  "stages": { builds: 5, step(build) { showBuild("stages", build); } },
+  "cases": { builds: 4, step(build) { showBuild("cases", build); } },
+  "practice": { builds: 5, step(build) { showBuild("practice", build); } },
+  "asan": { builds: 3, step(build) { showBuild("asan", build); } },
+  "diagnose": { builds: 5, step(build) { showBuild("diagnose", build); } },
+  "summary": { builds: 3, step(build) { showBuild("summary", build); } }
+};
+
+/* =====================================================================
+   DECK ENGINE (adapted from the Nov 2026 seminar deck)
+   ===================================================================== */
+const scenes=$$('.scene');
+let si=0,bi=0,prevSi=-1,clockStart=0;
+function builds(i){const c=CFG[scenes[i].dataset.id]||{};if(c.builds)return c.builds;return 1+Math.max(0,...$$('[data-b]',scenes[i]).map(e=>+e.dataset.b));}
+function render(){
+  const sc=scenes[si],c=CFG[sc.dataset.id]||{},entered=prevSi!==si;
+  if(entered&&prevSi>=0){const old=scenes[prevSi];const oc=CFG[old.dataset.id]||{};oc.leave&&oc.leave(old);old.classList.remove('active');$$('[data-b]',old).forEach(e=>e.classList.remove('on','past'));}
+  sc.classList.add('active');
+  const apply=()=>$$('[data-b]',sc).forEach(e=>{const b=+e.dataset.b,u=e.dataset.until!==undefined?+e.dataset.until:99;const on=b<=bi&&bi<=u;e.classList.toggle('on',on);e.classList.toggle('past',on&&e.hasAttribute('data-past')&&bi>b);});
+  if(entered&&!STATIC())requestAnimationFrame(()=>requestAnimationFrame(apply));else apply();
+  c.step&&c.step(bi,entered);
+  prevSi=si;
+  $('#hudL').textContent=sc.dataset.chapter||'';
+  $('#hudR').textContent=String(si+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0');
+  $('#prog').style.width=((si+(bi+1)/builds(si))/scenes.length*100)+'%';
+  try{history.replaceState(null,'',location.pathname+location.search+'#p'+(si+1)+'-'+bi);}catch(e){}
+  $('#nTitle').textContent=sc.dataset.title||'';$('#nPos').textContent='Page '+(si+1)+' · build '+(bi+1)+' of '+builds(si);
+  $('#nNext').textContent=si+1<scenes.length?'Next: '+scenes[si+1].dataset.title:'End';
+  const n=$('aside.notes',sc);$('#nBody').textContent=n?n.textContent.trim():'';
+  const z=$('aside.notes-zh',sc);$('#nZh').innerHTML=z?z.innerHTML.trim():'';
+}
+function next(){if(!clockStart)clockStart=Date.now();if(bi<builds(si)-1)bi++;else if(si<scenes.length-1){si++;bi=0;}render();}
+function prev(){if(bi>0)bi--;else if(si>0){si--;bi=builds(si)-1;}render();}
+function go(i,b=0){si=Math.max(0,Math.min(scenes.length-1,i));bi=Math.max(0,Math.min(builds(si)-1,b));render();}
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key;
+  if(k==='-'||k==='_'){e.preventDefault();setSafe(SAFE-0.02);return;}
+  if(k==='='||k==='+'){e.preventDefault();setSafe(SAFE+0.02);return;}
+  if(e.shiftKey&&(k==='ArrowUp'||k==='ArrowDown')){e.preventDefault();setShift(SHIFT+(k==='ArrowUp'?-10:10));return;}
+  if(k==='r'||k==='R'){SAFE=DEFSAFE;SHIFT=0;store('safe',SAFE);store('shift',0);fit();sizeMsg();return;}
+  if(/^[0-9]$/.test(k)){e.preventDefault();setJump((jump+k).replace(/^0+/,'').slice(-2));return;}
+  if(jump&&k==='Enter'){e.preventDefault();const n=+jump;setJump('');if(n>=1&&n<=scenes.length){showContents(false);go(n-1);}return;}
+  if(jump&&k==='Backspace'){e.preventDefault();setJump(jump.slice(0,-1));return;}
+  if(jump&&k==='Escape'){setJump('');return;}
+  if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){e.preventDefault();next();}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();prev();}
+  else if(k==='Home')go(0);else if(k==='End')go(scenes.length-1);
+  else if((k==='c'||k==='C')&&REHEARSAL){document.documentElement.classList.toggle('nozh');}
+  else if((k==='n'||k==='N')&&REHEARSAL){document.documentElement.classList.toggle('rehearse');fit();}
+  else if(k==='g'||k==='G')showContents();
+  else if(k==='Escape')showContents(false);
+  else if(k==='f'||k==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+});
+$('#stage').addEventListener('click',e=>{if(e.target.closest('a'))return;(e.clientX<window.innerWidth*0.18?prev:next)();});
+const CHAPTERS=(()=>{const out=[];scenes.forEach((s,i)=>{const c=s.dataset.chapter||'Opening';let g=out[out.length-1];if(!g||g.name!==c){g={name:c,pages:[]};out.push(g);}g.pages.push(i);});return out;})();
+$('#ovGrid').innerHTML=CHAPTERS.map(g=>`<div class="ovCol"><h4 data-i="${g.pages[0]}">${g.name}</h4><ol>`+
+  g.pages.map(i=>`<li data-i="${i}"><span class="p">${String(i+1).padStart(2,'0')}</span><span>${scenes[i].dataset.title}</span></li>`).join('')+'</ol></div>').join('');
+function showContents(on){const o=$('#overview');if(on===undefined)on=!o.classList.contains('show');o.classList.toggle('show',on);
+  if(on){$$('#ovGrid li').forEach(li=>li.classList.toggle('cur',+li.dataset.i===si));const c=$('#ovGrid li.cur');if(c)c.scrollIntoView({block:'center'});}}
+$('#ovGrid').addEventListener('click',e=>{const t=e.target.closest('[data-i]');if(t){showContents(false);go(+t.dataset.i);}});
+$('#hudR').addEventListener('click',e=>{e.stopPropagation();showContents(true);});
+let jump='',jumpT=0;
+function setJump(v){jump=v;const b=$('#jumpBox');clearTimeout(jumpT);
+  if(v){b.textContent='Go to page '+v+' · Enter';b.classList.add('show');jumpT=setTimeout(()=>setJump(''),4000);}else b.classList.remove('show');}
+setInterval(()=>{if(!clockStart)return;const s=Math.floor((Date.now()-clockStart)/1000);$('#nClock').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},500);
+setTimeout(()=>{$('#help').style.opacity=0;},6000);
+const MODE=document.documentElement.dataset.mode||'audience';
+const DEFSAFE=MODE==='projector'?0.92:1;
+const store=(k,v)=>{try{if(v===undefined)return localStorage.getItem('cop4610-l10_more_on_stack-'+MODE+'-'+k);localStorage.setItem('cop4610-l10_more_on_stack-'+MODE+'-'+k,v);}catch(e){return null;}};
+let SAFE=(()=>{const v=parseFloat(store('safe'));return v>=0.6&&v<=1?v:DEFSAFE;})();
+let SHIFT=(()=>{const v=parseFloat(store('shift'));return isFinite(v)?v:0;})();
+let sizeT=0;
+function sizeMsg(){const b=$('#sizeBox');b.textContent='Slide size '+Math.round(SAFE*100)+'%'+(SHIFT?' · moved '+(SHIFT<0?'up ':'down ')+Math.abs(SHIFT)+' px':'')+' · − / = size · Shift+↑↓ move · R reset';
+  b.classList.add('show');clearTimeout(sizeT);sizeT=setTimeout(()=>b.classList.remove('show'),3000);}
+function setSafe(v){SAFE=Math.round(Math.min(1,Math.max(0.6,v))*100)/100;store('safe',SAFE);fit();sizeMsg();}
+function setShift(v){SHIFT=Math.max(-300,Math.min(300,v));store('shift',SHIFT);fit();sizeMsg();}
+function fit(){const v=$('#viewport');const s=Math.min(v.clientWidth/1920,v.clientHeight/1080)*SAFE;$('#stage').style.transform='translateY('+SHIFT+'px) scale('+s+')';}
+const REHEARSAL=MODE==='rehearsal';
+if(REHEARSAL){document.documentElement.classList.add('rehearse');$('#help').textContent='→ next · ← back · N script · C 中文 · G index · number + Enter: go to page · F full screen';}
+if(/static/.test(location.search))document.documentElement.classList.add('static');
+window.addEventListener('resize',fit);document.addEventListener('fullscreenchange',()=>setTimeout(fit,50));fit();
+function fromHash(){const m=location.hash.match(/^#p?(\d+)(?:[.-](\d+))?/);if(m)go(+m[1]-1,+(m[2]||0));else go(0);}
+window.addEventListener('hashchange',fromHash);fromHash();
+</script>
+</body>
+</html>
