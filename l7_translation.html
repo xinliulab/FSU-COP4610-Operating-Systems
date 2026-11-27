@@ -400,7 +400,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="va7" data-b="0" style="--d:.6s;left:1180px;top:640px" id="tiVa"><div class="f g"><b>0x00403</b><span>page</span></div><div class="f t"><b>004</b><span>offset</span></div></div>
     <div class="lb mono" id="tiPa" style="left:1180px;top:780px;font-size:34px;color:#fff;opacity:0;transition:opacity .6s">→ frame 0x1a2 · physical 0x1a2004</div>
     <div class="cred" data-b="0" style="--d:1.3s">Pauli Rautakorpi, CC BY 3.0</div>
-    <div class="cred" data-b="0" style="--d:1.3s;left:120px;right:auto;text-align:left">After Xin Liu's 2025 COP 4610 slides and OSTEP Chapters 15 to 20 (Arpaci-Dusseau)</div>
+    <div class="cred" data-b="0" style="--d:1.3s;left:120px;right:auto;text-align:left">After OSTEP Chapters 15 to 20 (Arpaci-Dusseau)</div>
   </section>
   <section class="scene" data-id="illusion" data-title="Three illusions" data-chapter="01 · Protection">
     <div class="route" data-sub="three illusions" data-t="1"></div>
@@ -415,7 +415,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="box6 t" data-b="1" style="--d:.4s;left:960px;top:580px;width:840px;height:110px">Sharing is invisible<small>a process cannot tell if a page is shared</small></div>
     <svg class="abs" data-b="1" style="left:0;top:0" width="1920" height="1080"><path class="arr6 t" d="M 884 335 L 954 335" marker-end="url(#a7T)"/><path class="arr6 t" d="M 884 485 L 954 485" marker-end="url(#a7T)"/><path class="arr6 t" d="M 884 635 L 954 635" marker-end="url(#a7T)"/></svg>
     <div class="lb g tk" data-b="2">Translation turns raw memory into three illusions: isolation, size, invisible sharing</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7)</div>
   </section>
   <section class="scene" data-id="noprot" data-title="One bad pointer crashes everything" data-chapter="01 · Protection">
     <div class="route" data-sub="no protection" data-t="1"></div>
@@ -434,7 +433,6 @@ aside.notes,aside.notes-zh{display:none}
     <svg class="abs" data-b="1" style="--d:.4s;left:0;top:0" width="1920" height="1080"><path class="arr6 r" d="M 400 650 C 520 760 760 760 900 646" marker-end="url(#a7R)"/></svg>
     <div class="lb" data-b="1" style="--d:.5s;left:420px;top:760px;font-size:30px;color:var(--red)">a bug in application 1 writes into application 2, or the OS</div>
     <div class="lb g tk" data-b="2">Rewriting addresses at load time protects no one</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7)</div>
   </section>
   <section class="scene" data-id="table" data-title="Translate every address" data-chapter="01 · Protection">
     <div class="route" data-sub="translation" data-t="1"></div>
@@ -447,7 +445,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:120px;top:230px;font-size:32px">A process can only name its own addresses<small>it cannot even say "the OS's memory" or "process B's memory"</small></div>
     <div class="lb g" data-b="1" style="--d:.3s;left:1080px;top:230px;font-size:32px">Two hardware mechanisms<small>address translation, and dual-mode operation</small></div>
     <div class="lb g tk" data-b="2">Translate every address, and a process can only name its own memory</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · OSTEP Chapter 15</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 15</div>
   </section>
   <section class="scene" data-id="bb" data-title="Base and bound" data-chapter="02 · Base and bound">
     <div class="route" data-sub="two registers" data-t="2"></div>
@@ -482,7 +480,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="--d:.3s;left:620px;top:470px;font-size:32px;color:var(--red)">22 KB are free, but not in one piece: D does not fit</div>
     <div class="lb" data-b="2" style="left:620px;top:600px;font-size:30px">First fit · best fit · worst fit: which hole to use?<small>or copy everything to close the gaps: slow</small></div>
     <div class="lb g tk" data-b="3">One contiguous block per process wastes the memory between blocks</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · sizes illustrative</div>
+    <div class="cred" data-b="0" style="--d:.8s">sizes illustrative</div>
   </section>
   <section class="scene" data-id="segs" data-title="Segmentation" data-chapter="03 · Segments">
     <div class="route" data-sub="segments" data-t="3"></div>
@@ -503,7 +501,7 @@ aside.notes,aside.notes-zh{display:none}
       <path class="arr6" style="stroke:#82aaff" d="M 644 735 C 950 735 960 515 1270 515"/>
     </svg>
     <div class="lb g tk" data-b="2">Each piece of the program gets its own base and bound</div>
-    <div class="cred" data-b="0" style="--d:.8s">Example from Xin Liu's 2025 COP 4610 slides (Lecture 7) · OSTEP Chapter 16</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 16</div>
   </section>
   <section class="scene" data-id="segx" data-title="Translate with segments" data-chapter="03 · Segments">
     <div class="route" data-sub="translate" data-t="3"></div>
@@ -518,7 +516,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="res7" id="sxPa" style="left:120px;top:580px"></div>
     <div class="lb" data-b="0" style="--d:.5s;left:1080px;top:560px;font-size:28px;color:var(--ink2)">physical = base[seg] + offset<br>if offset &lt; bound[seg]</div>
     <div class="lb g tk" data-b="3">The hardware does it on every access: pick the segment, check, add</div>
-    <div class="cred" data-b="0" style="--d:.8s">Examples from Xin Liu's 2025 COP 4610 slides (Lecture 7)</div>
   </section>
   <section class="scene" data-id="segpro" data-title="Segments share code" data-chapter="03 · Segments">
     <div class="route" data-sub="sharing" data-t="3"></div>
@@ -532,7 +529,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:120px;top:740px;font-size:30px;color:var(--red)">But each segment still needs one contiguous block: the holes come back</div>
     <div class="lb" data-b="1" style="--d:.3s;left:1180px;top:795px;font-size:26px;color:var(--ink2)">x86-64 still keeps two segments, fs and gs,<br>for thread-local storage</div>
     <div class="lb g tk" data-b="2">Segments share code nicely, but each one still needs a contiguous block</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · OSTEP Chapter 16</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 16</div>
   </section>
   <section class="scene" data-id="pages" data-title="Paging" data-chapter="04 · Paging">
     <div class="route" data-sub="pages" data-t="4"></div>
@@ -545,7 +542,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="0" style="--d:.5s;left:120px;top:790px;font-size:30px">every page is 4 KiB<small>memory[N_PAGES][PAGE_SIZE]</small></div>
     <div class="lb" data-b="1" style="--d:.3s;left:900px;top:790px;font-size:30px">any page can go into any free frame<small>the OS keeps a bitmap of free frames</small></div>
     <div class="lb g tk" data-b="2">Pages are all the same size, so any free frame will do</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · OSTEP Chapter 18</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 18</div>
   </section>
   <section class="scene" data-id="pagex" data-title="Translate with a page table" data-chapter="04 · Paging">
     <div class="route" data-sub="translate" data-t="4"></div>
@@ -557,7 +554,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="res7" id="pxPa" style="left:120px;top:500px"></div>
     <div class="lb" data-b="0" style="--d:.5s;left:1180px;top:560px;font-size:28px;color:var(--ink2)">physical = page_table[page] : offset</div>
     <div class="lb g tk" data-b="3">No adding, no bound: replace the page number, keep the offset</div>
-    <div class="cred" data-b="0" style="--d:.8s">Examples from Xin Liu's 2025 COP 4610 slides (Lecture 7)</div>
   </section>
   <section class="scene" data-id="size" data-title="Flat page tables are huge" data-chapter="04 · Paging">
     <div class="route" data-sub="too big" data-t="4"></div>
@@ -607,7 +603,7 @@ aside.notes,aside.notes-zh{display:none}
     <svg class="abs" data-b="0" style="--d:.5s;left:0;top:0" width="1920" height="1080"><path class="arr6 t" d="M 544 320 L 674 320" marker-end="url(#a7T)"/><path class="arr6 g" d="M 984 320 C 1060 320 1080 435 1136 435" marker-end="url(#a7G)"/></svg>
     <div class="lb" data-b="1" style="left:120px;top:700px;font-size:32px">+ size grows with RAM, not with the address space<small>− two keys can hash to one slot (collisions) · used by IBM POWER</small></div>
     <div class="lb g tk" data-b="2">Inverted tables grow with RAM, not with the address space</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · entries illustrative · OSTEP Chapter 20</div>
+    <div class="cred" data-b="0" style="--d:.8s">entries illustrative · OSTEP Chapter 20</div>
   </section>
   <section class="scene" data-id="dual" data-title="Only the kernel may edit the tables" data-chapter="06 · Kernel">
     <div class="route" data-sub="who edits?" data-t="6"></div>
@@ -620,7 +616,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:1380px;top:250px;font-size:30px">Switch processes:<small>save CR3, load the next CR3</small></div>
     <div class="lb" data-b="1" style="--d:.2s;left:1380px;top:420px;font-size:30px">Into the kernel:<small>system call, interrupt, or exception;<br>the CPU sets kernel mode, saves the PC,<br>and jumps to the kernel's handler</small></div>
     <div class="lb g tk" data-b="2">Translation protects only if user code cannot edit the tables</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · x86 CR3; RISC-V satp</div>
+    <div class="cred" data-b="0" style="--d:.8s">x86 CR3; RISC-V satp</div>
   </section>
   <section class="scene" data-id="rowhammer" data-title="2015: Rowhammer flips a page table bit" data-chapter="06 · Kernel">
     <div class="route" data-sub="Rowhammer" data-t="6" data-br="1"></div>
@@ -640,7 +636,7 @@ aside.notes,aside.notes-zh{display:none}
     <svg class="abs" data-b="0" style="--d:.7s;left:0;top:0" width="1920" height="1080"><path class="arr6" d="M 512 320 L 544 320" marker-end="url(#a7M)"/><path class="arr6" d="M 942 320 L 974 320" marker-end="url(#a7M)"/><path class="arr6" d="M 1372 320 L 1404 320" marker-end="url(#a7M)"/></svg>
     <div class="lb" data-b="0" style="--d:.8s;left:120px;top:480px;font-size:34px">Only the kernel edits the tables; every switch changes CR3</div>
     <div class="lb g" data-b="1" style="left:120px;top:640px;font-size:34px">Next · Wednesday, February 3 · Lecture 8: caching<small>the TLB that makes the walk fast, CPU caches, Meltdown and Spectre · read OSTEP Chapters 15, 16, 18, 20</small></div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 7) · OSTEP Chapters 15 to 20</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapters 15 to 20</div>
   </section>
 
   <div id="hud"><div class="l" id="hudL"></div><div class="r num" id="hudR"></div><div id="prog"></div></div>

@@ -761,7 +761,7 @@ Thread 2: sum = 30000000</span>
     <div class="lb" id="prOS" style="left:960px;top:520px;font-size:28px;opacity:0;transition:opacity .5s">What the OS sees<small>T1: Ready (holds the lock) · T2, T3: Running (busy)</small></div>
     <div class="lb" id="prNum" style="left:960px;top:640px;font-size:28px;opacity:0;transition:opacity .5s">Spin lock on the MacBook, 4 logical CPUs<small>132 ns per sum++ with 4 threads → 360 ns with 16 threads</small></div>
     <div class="lb g tk" data-b="4">A spinner looks busy to the OS; only a system call can say "I am waiting"</div>
-    <div class="cred" data-b="0" style="--d:.8s">Thread states redrawn from Xin's earlier COP 4610 slides; scenario after the source lecture and OSTEP §28.12 · numbers: sum-experiment run.out (MacBook) · timeline schematic</div>
+    <div class="cred" data-b="0" style="--d:.8s">Scenario after the source lecture and OSTEP §28.12 · numbers: sum-experiment run.out (MacBook) · timeline schematic</div>
   </section>
   <section class="scene" data-id="mars" data-title="1997: Pathfinder keeps resetting on Mars" data-chapter="03 · Cost">
     <div class="route" data-sub="Mars, 1997" data-t="3" data-br="1"></div>
@@ -852,7 +852,7 @@ Thread 2: sum = 30000000</span>
     <div class="lb" id="mxSpin" style="left:1080px;top:745px;font-size:24px;color:#c3ccd8;opacity:0;transition:opacity .5s;white-space:normal;width:720px">Inside, the kernel guards lk's owner and queue with a short spin lock, interrupts off</div>
     <div class="lb g" id="mxCap" style="left:1160px;top:215px;font-size:27px;white-space:normal;width:640px"></div>
     <div class="lb g tk" data-b="6">Waiters use no CPU, but every lock and unlock is now a system call</div>
-    <div class="cred" data-b="0" style="--d:.8s">SYSCALL_acquire / SYSCALL_release: the source lecture's thought experiment (Linux has no such calls) · library-desk analogy from Xin's earlier COP 4610 slides · schematic</div>
+    <div class="cred" data-b="0" style="--d:.8s">SYSCALL_acquire / SYSCALL_release: the source lecture's thought experiment (Linux has no such calls) · schematic</div>
   </section>
   <section class="scene" data-id="syscost" data-title="A system call costs 130 lock addq" data-chapter="05 · Mutex">
     <div class="route" data-sub="syscost.c" data-t="5"></div>
@@ -908,7 +908,7 @@ Thread 2: sum = 30000000</span>
     <div class="qbox" id="fxQ" data-b="0" style="--d:.5s;left:1060px;top:640px;width:740px;height:90px">wait queue for &amp;val</div>
     <div class="lb" id="fxL2" style="left:1060px;top:750px;font-size:24px;color:#c3ccd8;opacity:0;transition:opacity .4s;white-space:normal;width:740px"><span style="color:var(--red);font-family:var(--mono)">futex_wait(&amp;val, v)</span>: sleep, if val is still v<br><span style="color:var(--teal);font-family:var(--mono)">futex_wake(&amp;val, n)</span>: wake up to n sleepers</div>
     <div class="lb g tk" data-b="4">No contention, no system call: enter the kernel only to wait or wake</div>
-    <div class="cred" data-b="0" style="--d:.8s">Fast and slow path table after Xin's earlier COP 4610 slides · futex_wait / futex_wake as defined in Drepper, "Futexes Are Tricky" (v1.6, 2011), appendix · schematic</div>
+    <div class="cred" data-b="0" style="--d:.8s">futex_wait / futex_wake as defined in Drepper, "Futexes Are Tricky" (v1.6, 2011), appendix · schematic</div>
   </section>
   <section class="scene" data-id="futexcode" data-title="Drepper's futex mutex, step by step" data-chapter="06 · Futex">
     <div class="route" data-sub="futex-sim.py" data-t="6"></div>

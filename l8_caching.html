@@ -414,7 +414,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="box6" data-b="0" style="--d:.6s;left:1100px;top:700px;width:620px;height:100px;text-align:center">disk<small>huge, very slow</small></div>
     <div class="dot" id="tiDot" style="left:1410px;top:300px;opacity:0"></div>
     <div class="lb" id="tiHit" style="left:1640px;top:385px;font-size:30px;color:var(--teal);opacity:0;transition:opacity .4s">hit</div>
-    <div class="cred" data-b="0" style="--d:1.3s;left:120px;right:auto;text-align:left">After Xin Liu's 2025 COP 4610 slides (Lecture 8), the SEED Labs Meltdown and Spectre labs, and OSTEP Chapter 19</div>
+    <div class="cred" data-b="0" style="--d:1.3s;left:120px;right:auto;text-align:left">After the SEED Labs Meltdown and Spectre labs and OSTEP Chapter 19</div>
   </section>
   <section class="scene" data-id="latency" data-title="If L1 took one second" data-chapter="01 · Hierarchy">
     <div class="route" data-sub="how slow?" data-t="1"></div>
@@ -438,7 +438,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="2" style="left:120px;top:540px;font-size:32px">Spatial locality: the next a[i] is in the same line<small>one miss brings in 16 ints; the next 15 hit</small></div>
     <div class="lb" data-b="3" style="left:120px;top:660px;font-size:32px">Temporal locality: sum, i, and the loop's code are used again and again<small>they stay in the cache the whole time</small></div>
     <div class="lb g tk" data-b="4">Programs reuse what they just touched, and touch what sits next to it</div>
-    <div class="cred" data-b="0" style="--d:.8s">64-byte cache lines on x86-64 · after Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
+    <div class="cred" data-b="0" style="--d:.8s">64-byte cache lines on x86-64</div>
   </section>
   <section class="scene" data-id="eat" data-title="Effective access time" data-chapter="02 · Hit or miss">
     <div class="route" data-sub="the math" data-t="2"></div>
@@ -450,7 +450,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb mono" id="eaB" style="left:120px;top:600px;font-size:40px;color:#fff"></div>
     <div class="lb mono" id="eaC" style="left:120px;top:680px;font-size:52px;color:var(--gold)"></div>
     <div class="lb g tk" data-b="4">A high hit rate makes the slow level almost disappear</div>
-    <div class="cred" data-b="0" style="--d:.8s">Example from Xin Liu's 2025 COP 4610 slides (Lecture 8) · cycle counts illustrative</div>
+    <div class="cred" data-b="0" style="--d:.8s">cycle counts illustrative</div>
   </section>
   <section class="scene" data-id="twolevel" data-title="Two levels of cache" data-chapter="02 · Hit or miss">
     <div class="route" data-sub="L1 and L2" data-t="2"></div>
@@ -464,7 +464,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb mono" id="tvA" style="left:120px;top:540px;font-size:34px;color:#fff"></div>
     <div class="lb mono" id="tvB" style="left:120px;top:640px;font-size:34px;color:#fff"></div>
     <div class="lb g tk" data-b="3">Each level's misses pay for the level below; compute from the bottom up</div>
-    <div class="cred" data-b="0" style="--d:.8s">Example from Xin Liu's 2025 COP 4610 slides (Lecture 8) · numbers illustrative</div>
+    <div class="cred" data-b="0" style="--d:.8s">numbers illustrative</div>
   </section>
   <section class="scene" data-id="misses" data-title="Why misses happen" data-chapter="02 · Hit or miss">
     <div class="route" data-sub="four misses" data-t="2"></div>
@@ -475,7 +475,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="box6 t" data-b="0" style="--d:.8s;left:1000px;top:440px;width:800px;height:150px">Policy<small>the replacement policy threw out the wrong entry</small></div>
     <div class="lb" data-b="1" style="left:120px;top:680px;font-size:36px">Compulsory · Capacity · Conflict · Policy: three C's and a P</div>
     <div class="lb g tk" data-b="2">Some misses are unavoidable; the others depend on size, layout, and policy</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
   </section>
   <section class="scene" data-id="tlb" data-title="The TLB caches translations" data-chapter="03 · TLB">
     <div class="route" data-sub="the TLB" data-t="3"></div>
@@ -489,7 +488,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb t" data-b="0" style="--d:.6s;left:1050px;top:400px;font-size:30px">hit: done in about a cycle</div>
     <div class="lb" data-b="1" style="--d:.3s;left:1100px;top:640px;font-size:30px;color:var(--red)">miss: walk, then remember<small>the new translation goes into the TLB</small></div>
     <div class="lb g tk" data-b="2">The TLB remembers recent translations, so most accesses skip the walk</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 19</div>
   </section>
   <section class="scene" data-id="tlbx" data-title="A TLB lookup" data-chapter="03 · TLB">
     <div class="route" data-sub="lookup" data-t="3"></div>
@@ -500,7 +499,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="res7" id="txRes" style="left:1000px;top:380px"></div>
     <div class="lb" id="txCap" style="left:120px;top:560px;font-size:30px"></div>
     <div class="lb g tk" data-b="3">Hit: use it. Miss: walk the table, fill an entry, try again</div>
-    <div class="cred" data-b="0" style="--d:.8s">TLB contents from Xin Liu's 2025 COP 4610 slides (Lecture 8) · page 5's frame illustrative</div>
+    <div class="cred" data-b="0" style="--d:.8s">page 5's frame illustrative</div>
   </section>
   <section class="scene" data-id="assoc" data-title="Where can an entry go?" data-chapter="03 · TLB">
     <div class="route" data-sub="where to look" data-t="3"></div>
@@ -514,7 +513,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:120px;top:680px;font-size:30px">cheap, but two hot pages can fight over one slot</div>
     <div class="lb" data-b="1" style="--d:.2s;left:1260px;top:680px;font-size:30px">no fights, but many comparators<small>small TLBs are often built this way</small></div>
     <div class="lb g tk" data-b="2">More places to look means fewer conflicts, but more hardware</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
   </section>
   <section class="scene" data-id="switch" data-title="TLB entries belong to one process" data-chapter="03 · TLB">
     <div class="route" data-sub="switching" data-t="3"></div>
@@ -526,7 +524,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:120px;top:620px;font-size:32px">Fix 1: flush the TLB at every switch<small>simple, but every process starts cold</small></div>
     <div class="lb" data-b="1" style="--d:.3s;left:1000px;top:620px;font-size:32px">Fix 2: tag each entry with an address-space ID<small>x86 PCID, Arm ASID: entries of many processes live together</small></div>
     <div class="lb g tk" data-b="2">A translation is only true for one address space: flush it or tag it</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 19</div>
   </section>
   <section class="scene" data-id="lru" data-title="Which entry to throw out?" data-chapter="04 · Writes">
     <div class="route" data-sub="replacement" data-t="4"></div>
@@ -537,7 +535,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="0" style="--d:.5s;left:1000px;top:320px;font-size:30px">LRU: throw out the least recently used<small>good when the past predicts the future</small></div>
     <div class="lb" data-b="0" style="--d:.6s;left:1000px;top:460px;font-size:30px">Random: throw out any one<small>simple and fast; hardware TLBs often do this</small></div>
     <div class="lb g tk" data-b="5">Replacement is a guess about the future; LRU bets on locality</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 22 has more policies</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 22 has more policies</div>
   </section>
   <section class="scene" data-id="writes" data-title="Write-through or write-back" data-chapter="04 · Writes">
     <div class="route" data-sub="writes" data-t="4"></div>
@@ -549,7 +547,6 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="left:120px;top:740px;font-size:30px">always in sync, but every write is slow</div>
     <div class="lb" data-b="1" style="--d:.2s;left:1020px;top:740px;font-size:30px">many writes become one, but memory is stale for a while</div>
     <div class="lb g tk" data-b="2">Write-through stays in sync; write-back saves traffic. Speed against consistency</div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8)</div>
   </section>
   <section class="scene" data-id="secret" data-title="Remember a secret through the cache" data-chapter="05 · Meltdown">
     <div class="route" data-sub="the puzzle" data-t="5"></div>
@@ -560,7 +557,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="lb" data-b="1" style="--d:.3s;left:120px;top:620px;font-size:32px">Before the erase: touch array[7 × 4096]<small>now the line for slot 7 is in the cache</small></div>
     <div class="lb" data-b="2" style="left:120px;top:760px;font-size:32px">After: time a read of every slot. Slot 7 is fast</div>
     <div class="lb g tk" data-b="3">The cache remembers what you touched, even after the rollback</div>
-    <div class="cred" data-b="0" style="--d:.8s">Puzzle after Xin Liu's 2025 COP 4610 slides and the SEED Labs Meltdown lab (Wenliang Du) · times illustrative</div>
+    <div class="cred" data-b="0" style="--d:.8s">Puzzle after the SEED Labs Meltdown lab (Wenliang Du) · times illustrative</div>
   </section>
   <section class="scene" data-id="flush" data-title="Flush+Reload" data-chapter="05 · Meltdown">
     <div class="route" data-sub="Flush+Reload" data-t="5"></div>
@@ -618,7 +615,7 @@ aside.notes,aside.notes-zh{display:none}
     <div class="box6 g" data-b="0" style="--d:.35s;left:690px;top:230px;width:540px;height:200px">the TLB<small>caches translations;<br>flush or tag on a switch;<br>replacement guesses the future</small></div>
     <div class="box6" data-b="0" style="--d:.5s;left:1260px;top:230px;width:540px;height:200px;border-color:var(--red)">side channels<small>Flush+Reload times the cache;<br>Meltdown and Spectre read<br>what they should not</small></div>
     <div class="lb g" data-b="1" style="left:120px;top:560px;font-size:34px">Next · Monday, February 8 · Lecture 9: the stack<small>how calls and returns use memory, and why a return address is a target · read OSTEP Chapter 19</small></div>
-    <div class="cred" data-b="0" style="--d:.8s">After Xin Liu's 2025 COP 4610 slides (Lecture 8) · OSTEP Chapter 19 · SEED Labs</div>
+    <div class="cred" data-b="0" style="--d:.8s">OSTEP Chapter 19 · SEED Labs</div>
   </section>
 
   <div id="hud"><div class="l" id="hudL"></div><div class="r num" id="hudR"></div><div id="prog"></div></div>
