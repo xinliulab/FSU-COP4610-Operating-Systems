@@ -792,7 +792,7 @@ svg.ov{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
     <div class="abs" id="szG" data-b="0" style="--d:.2s;left:0;top:0;width:1920px;height:1080px"></div>
     <div class="lb" id="szN" style="left:420px;top:770px;font-size:30px;opacity:0;transition:opacity .4s">one GPU driver (AMD, drivers/gpu/drm/amd): <span class="gold mono">6.5 M lines</span><small>more than kernel + mm + fs together (2.5 M)</small></div>
     <div class="lb g tk" data-b="2">Most kernel code is drivers, and each driver has full kernel power</div>
-    <div class="cred" data-b="0" style="--d:.8s">Counted on this laptop: lines in .c and .h files of linux-7.3.tar.xz (kernel.org, released 2026-10-19) · scripts and outputs in source/code/linux_*lines.* · Phoronix counted about 6.5 M for the AMD driver in 7.3-rc1 (Aug 2026)</div>
+    <div class="cred" data-b="0" style="--d:.8s">Counted on this laptop: lines in .c and .h files of linux-7.3.tar.xz (kernel.org; Linux 7.3 released 2026-10-18) · scripts and outputs in source/code/linux_*lines.* · Phoronix, Aug 30, 2026: 6.52 M lines in drivers/gpu/drm/amd at 7.3-rc1 (cloc)</div>
   </section>
   <section class="scene" data-id="bugs" data-title="Drivers hold the most kernel bugs" data-chapter="03 · Drivers">
     <div class="route" data-sub="bugs" data-t="3" data-br="1"></div>
@@ -849,7 +849,7 @@ svg.ov{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
     <div class="lb" data-b="2" style="left:1040px;top:600px;font-size:26px;color:var(--red)">a crash kills one process, not the kernel<small>Windows: UMDF since Vista (2007) · macOS: DriverKit since 2019</small></div>
     <div class="lb t" data-b="2" style="--d:.4s;left:150px;top:705px;font-size:28px">the kernel keeps running</div>
     <div class="lb g tk" data-b="3">Outside the kernel, a driver crash costs one process, not the machine</div>
-    <div class="cred" data-b="0" style="--d:.8s">Outputs from this laptop (macOS 26.7.3), source/code/macos_drivers.out (paths shortened) · Apple WWDC 2019 "System Extensions and DriverKit" · Microsoft Learn, UMDF version history</div>
+    <div class="cred" data-b="0" style="--d:.8s">Outputs from this laptop (macOS 26.7.3), source/code/macos_drivers.out (paths shortened) · Apple WWDC 2019 "System Extensions and DriverKit" · Microsoft Learn: UMDF version history (UMDF 1.5, in Windows Vista), Vista lifecycle (Jan 25, 2007)</div>
   </section>
   <section class="scene" data-id="knobs" data-title="Devices have knobs, not only bytes" data-chapter="04 · ioctl">
     <div class="route" data-sub="control" data-t="4"></div>
@@ -958,7 +958,7 @@ Hello World!</pre></div>
     <div class="cell" data-b="1" style="--d:.5s;position:absolute;left:1060px;top:690px;width:680px;border-color:var(--gold-d)"><b>Windows</b><small>runs the virtual machine</small></div>
     <div class="lb t" data-b="1" style="--d:.7s;left:1060px;top:630px;font-size:22px">"full system call compatibility" (Microsoft, May 6, 2019)</div>
     <div class="lb g tk" data-b="3">ioctl and /proc hide too many rules to copy: run the real kernel</div>
-    <div class="cred" data-b="0" style="--d:.8s">Story after the source lecture · WSL 2: Microsoft command-line blog, "Announcing WSL 2", May 6, 2019 (real Linux kernel; full system call compatibility) · WSL 1 shipped in Windows 10, 2016</div>
+    <div class="cred" data-b="0" style="--d:.8s">Story after the source lecture · WSL 1: Microsoft WSL blog, Apr 22, 2016 (pico processes; Linux system calls translated to NT), in Windows 10 Aug 2, 2016 · WSL 2: Microsoft, "Announcing WSL 2", May 6, 2019 (real Linux kernel; full system call compatibility)</div>
   </section>
   <section class="scene" data-id="kvm" data-title="/dev/kvm: a computer made of ioctls" data-chapter="05 · KVM">
     <div class="route" data-sub="kvm.c" data-t="5"></div>
@@ -970,35 +970,38 @@ Hello World!</pre></div>
       <div class="r">                 MAP_SHARED | MAP_ANONYMOUS, -1, 0);</div>
       <div class="r">ioctl(vmfd, KVM_SET_USER_MEMORY_REGION, &amp;mem_region);</div>
       <div class="r">vcpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);</div>
-      <div class="r">ioctl(vcpufd, KVM_ARM_VCPU_INIT, &amp;init);   <span class="c">// ARM64 setup</span></div>
+      <div class="r">ioctl(vcpufd, KVM_SET_SREGS, &amp;sregs);   <span class="c">// CS base = 0</span></div>
       <div class="r">run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,</div>
       <div class="r">           MAP_SHARED, vcpufd, 0);</div>
       <div class="r">memcpy(guest_mem, guest_code, sizeof(guest_code));</div>
-      <div class="r">set_core_reg(vcpufd, ARM64_CORE_REG(pc), GUEST_ENTRY);</div>
+      <div class="r">ioctl(vcpufd, KVM_SET_REGS, &amp;regs);     <span class="c">// rip = 0x4000</span></div>
       <div class="r">while (1) {</div>
       <div class="r">    ioctl(vcpufd, KVM_RUN, 0);</div>
       <div class="r">    switch (run-&gt;exit_reason) {</div>
       <div class="r">    case KVM_EXIT_MMIO:   <span class="c">// the guest touched a "device"</span></div>
       <div class="r">        printf("MMIO WRITE: addr=0x%llx, data='%c'\n", ...);</div>
-      <div class="r">    ...</div>
+      <div class="r">        break;</div>
+      <div class="r">    case KVM_EXIT_HLT: printf("KVM_EXIT_HLT\n"); goto done;</div>
     </div>
-    <div class="lay" data-b="0" style="--d:.3s;left:960px;top:195px;width:840px;height:250px"><span class="ln">User process · kvm.c</span></div>
+    <div class="lay" data-b="0" style="--d:.3s;left:960px;top:195px;width:840px;height:250px"><span class="ln">User process · kvm_x86.c</span></div>
     <div class="mseg" id="kvF0" style="left:990px;top:240px;width:170px;height:50px;opacity:0"><span><b>fd</b> kvm</span></div>
     <div class="mseg" id="kvF1" style="left:1175px;top:240px;width:170px;height:50px;opacity:0"><span><b>fd</b> vmfd</span></div>
     <div class="mseg" id="kvF2" style="left:1360px;top:240px;width:190px;height:50px;opacity:0"><span><b>fd</b> vcpufd</span></div>
-    <div class="mseg" id="kvMem" style="left:990px;top:310px;width:520px;height:110px;opacity:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px"><span><b>guest_mem</b> · 16 KB</span><span id="kvCodeB" style="font-size:18px;line-height:1.3;color:var(--teal);opacity:0;transition:opacity .4s;white-space:nowrap">mov x0,#0x41 · mov x1,#0x10000<br>strb w0,[x1] · hvc #0</span></div>
+    <div class="mseg" id="kvMem" style="left:990px;top:310px;width:520px;height:110px;opacity:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px"><span><b>guest_mem</b> · 16 KB</span><span id="kvCodeB" style="font-size:18px;line-height:1.3;color:var(--teal);opacity:0;transition:opacity .4s;white-space:nowrap">mov ax,0x1000 · mov ds,ax<br>mov byte [0],'A' · hlt</span></div>
     <div class="mseg" id="kvRun" style="left:1530px;top:310px;width:250px;height:110px;opacity:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px"><span><b>run</b> (kvm_run)</span><span id="kvRunR" style="font-size:19px;color:var(--gold);opacity:0;transition:opacity .4s">exit: MMIO</span></div>
     <div class="bnd" data-b="0" style="--d:.3s;left:960px;top:466px;width:840px"><b>ioctl: user → kernel</b></div>
-    <div class="lay k" data-b="0" style="--d:.35s;left:960px;top:485px;width:840px;height:375px"><span class="ln">Kernel · KVM</span></div>
-    <div class="lay lit" id="kvVM" style="left:990px;top:530px;width:780px;height:310px;opacity:0"><span class="ln">Virtual machine</span></div>
+    <div class="lay k" data-b="0" style="--d:.35s;left:960px;top:485px;width:840px;height:265px"><span class="ln">Kernel · KVM</span></div>
+    <div class="lay lit" id="kvVM" style="left:990px;top:530px;width:780px;height:200px;opacity:0"><span class="ln">Virtual machine</span></div>
     <div class="mseg" id="kvSlot" style="left:1015px;top:575px;width:480px;height:52px;opacity:0;font-size:18px;white-space:nowrap"><span>slot 0: guest <b>0x4000</b>, 16 KB → <i>guest_mem</i></span></div>
-    <div class="mseg" id="kvCpu" style="left:1515px;top:575px;width:245px;height:110px;opacity:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px"><span><b>vCPU</b></span><span id="kvPC" style="font-size:20px;opacity:0;transition:opacity .4s">PC = <i>0x4000</i></span></div>
-    <div class="lb" id="kvEx" style="left:1015px;top:650px;font-size:23px;color:var(--gold);opacity:0;transition:opacity .4s">strb to 0x10000: no memory there<small>the CPU leaves the guest: a VM exit</small></div>
-    <div class="tbd" id="kvTbd" style="position:absolute;left:1015px;top:745px;width:735px;font-size:20px;padding:10px 16px;opacity:0;transition:opacity .4s">Real output: needs ARM64 Linux with /dev/kvm. Not run here, and the source lecture did not show one.</div>
+    <div class="mseg" id="kvCpu" style="left:1515px;top:575px;width:245px;height:138px;opacity:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px"><span><b>vCPU</b></span><span id="kvMode" style="font-size:18px;opacity:0;transition:opacity .4s;white-space:nowrap">16-bit · CS base 0</span><span id="kvPC" style="font-size:20px;opacity:0;transition:opacity .4s">rip = <i>0x4000</i></span></div>
+    <div class="lb" id="kvEx" style="left:1015px;top:650px;font-size:23px;color:var(--gold);opacity:0;transition:opacity .4s">store to 0x10000: no memory there<small>the CPU leaves the guest: a VM exit</small></div>
+    <div class="tw" id="kvOut" style="left:960px;top:766px;width:840px;opacity:0;transition:opacity .4s"><pre style="padding:8px 24px;font-size:20px;line-height:1.35"><span class="p">$</span> <span class="w">./kvm_x86</span>                <span style="color:#b3bdcb">real run · x86-64 Linux (WSL 2)</span>
+<span class="gd" id="kvO1">MMIO WRITE: addr=0x10000, data='A'</span>
+<span class="gd" id="kvO2" style="opacity:0;transition:opacity .4s">KVM_EXIT_HLT</span></pre></div>
     <svg class="abs dg" id="kvSvg" style="left:0;top:0" width="1920" height="1080" viewBox="0 0 1920 1080"><path id="kvMap" d="M1300 575 V424" fill="none" stroke="#3fe0c5" stroke-width="2" stroke-dasharray="6 6" style="opacity:0;transition:opacity .4s"/><path id="kvUp" d="M1640 640 V424" fill="none"/></svg>
-    <div class="lb g" id="kvCap" style="left:120px;top:790px;font-size:27px"></div>
-    <div class="lb g tk" data-b="10">A whole computer, and not one read or write: only ioctl and mmap</div>
-    <div class="cred" data-b="0" style="--d:.8s">kvm.c (ARM64) from the source lecture's demos, error checks and two setup lines omitted · fd tables: Linux 7.3 virt/kvm/kvm_main.c (kvm_chardev_ops, kvm_vm_fops, kvm_vcpu_fops)</div>
+    <div class="lb g" id="kvCap" style="left:120px;top:800px;font-size:27px"></div>
+    <div class="lb g tk" data-b="12">A whole computer, and not one read or write: only ioctl and mmap</div>
+    <div class="cred" data-b="0" style="--d:.8s">kvm.c from the source lecture (Yanyan Jiang, jyywiki.cn, CC BY-NC 4.0), ported from ARM64 to x86-64 and shortened · output: real run, x86-64 Linux (WSL 2) · fd tables: Linux 7.3 virt/kvm/kvm_main.c (kvm_chardev_ops, kvm_vm_fops, kvm_vcpu_fops)</div>
   </section>
   <section class="scene" data-id="cam" data-title="A webcam frame: ioctl, mmap, ioctl" data-chapter="06 · Webcam">
     <div class="route" data-sub="V4L2" data-t="6"></div>
@@ -1058,7 +1061,7 @@ Hello World!</pre></div>
     <div class="mseg" id="gpS" style="left:1390px;top:795px;width:380px;height:50px"><span><b>cores</b> <i id="gpSv">idle</i></span></div>
     <svg class="abs dg" id="gpSvg" style="left:0;top:0" width="1920" height="1080" viewBox="0 0 1920 1080"><path id="gpP" d="M940 240 V625" fill="none"/></svg>
     <div class="lb g tk" data-b="5">A GPU driver is a big user library plus ioctl and mmap into the kernel</div>
-    <div class="cred" data-b="0" style="--d:.8s">Path after the source lecture (GPU: mmap memory to the driver, ioctl to submit commands; cudaMemcpy: ioctl gives the buffer, the driver starts DMA) · device files: NVIDIA driver docs · GPU: TheStriker, CC BY 4.0 · CUDA programming itself: Lecture 20</div>
+    <div class="cred" data-b="0" style="--d:.8s">Path after the source lecture (GPU: mmap memory to the driver, ioctl to submit commands; cudaMemcpy: ioctl gives the buffer, the driver starts DMA) · device files: NVIDIA open-gpu-kernel-modules (nv.c, uvm.c) · GPU: TheStriker, CC BY 4.0 · CUDA programming itself: Lecture 20</div>
   </section>
   <section class="scene" data-id="nvidia" data-title="2022: NVIDIA opens its kernel driver" data-chapter="07 · GPU">
     <div class="route" data-sub="open source" data-t="7" data-br="1"></div>
@@ -1297,16 +1300,19 @@ const Wsl={step(b){clearF('ws');const sv=$('#wsSvg');
   if(b===0)flowDots('ws',sv,[{d:$('#wsP1').getAttribute('d'),dur:1000,n:3,period:2400}]);
   if(b===2)flowDots('ws',sv,[{d:$('#wsP3').getAttribute('d'),dur:900,color:'#ff6b6b'}]);},leave(){clearF('ws');}};
 
-/* ---------- 18. /dev/kvm: one ioctl per click (kvm.c, source lecture) ---------- */
-const Kvm=(()=>{const R=[[],[0],[1],[2,3],[4],[5,6],[7,8],[9,10],[11,12],[13,14,15],[]];
-  const CAP=['Give it memory, a vCPU, code; run until it hits a device','1 · open /dev/kvm: fd kvm','2 · KVM_CREATE_VM: a VM in the kernel, fd vmfd','3 · mmap: 16 KB of plain memory in our process','4 · SET_USER_MEMORY_REGION: guest memory at 0x4000','5 · CREATE_VCPU, then ARM init: fd vcpufd','6 · mmap the vCPU fd: the shared run struct','7 · copy 4 instructions in; PC = 0x4000','8 · KVM_RUN: the CPU runs the guest until a VM exit',"9 · exit_reason = MMIO: addr 0x10000, data 'A'",'three fds, three tables: only ioctl and mmap'];
-  const LIT={1:['kvF0'],2:['kvF1'],3:['kvMem'],4:['kvSlot'],5:['kvF2','kvCpu'],6:['kvRun'],7:['kvMem','kvCpu'],8:['kvCpu'],9:['kvRun']};
+/* ---------- 18. /dev/kvm: one ioctl per click (kvm.c of the source lecture, ported to x86-64) ---------- */
+const Kvm=(()=>{const R=[[],[0],[1],[2,3],[4],[5],[6],[7,8],[9,10],[11,12],[13,14,15,16],[12,17],[]];
+  const CAP=['Give it memory, a vCPU, code; run until it hits a device','1 · open /dev/kvm: fd kvm','2 · KVM_CREATE_VM: a VM in the kernel, fd vmfd','3 · mmap: 16 KB of plain memory in our process','4 · SET_USER_MEMORY_REGION: guest memory at 0x4000','5 · CREATE_VCPU: a virtual CPU, fd vcpufd','6 · SET_SREGS: code segment base = 0 (16-bit mode)','7 · mmap the vCPU fd: the shared run struct','8 · copy 4 instructions in; SET_REGS: rip = 0x4000','9 · KVM_RUN: the CPU runs the guest until a VM exit',"10 · exit_reason = MMIO: addr 0x10000, data 'A'",'11 · KVM_RUN again: hlt, exit_reason = HLT, done','three fds, three tables: only ioctl and mmap'];
+  const LIT={1:['kvF0'],2:['kvF1'],3:['kvMem'],4:['kvSlot'],5:['kvF2','kvCpu'],6:['kvCpu'],7:['kvRun'],8:['kvMem','kvCpu'],9:['kvCpu'],10:['kvRun'],11:['kvCpu','kvRun']};
   const ALL=['kvF0','kvF1','kvF2','kvMem','kvSlot','kvCpu','kvRun'];
-  return {step(b){const k=Math.min(b,10);rows('#kvCode .r',R[k]);
+  return {step(b){const k=Math.min(b,12);rows('#kvCode .r',R[k]);
     show('kvF0',b>=1);show('kvF1',b>=2);show('kvVM',b>=2);show('kvMem',b>=3);show('kvSlot',b>=4);$('#kvMap').style.opacity=b>=4?1:0;
-    show('kvF2',b>=5);show('kvCpu',b>=5);show('kvRun',b>=6);show('kvCodeB',b>=7);show('kvPC',b>=7);show('kvEx',b>=8);show('kvRunR',b>=9);show('kvTbd',b>=9);
+    show('kvF2',b>=5);show('kvCpu',b>=5);show('kvMode',b>=6);show('kvRun',b>=7);show('kvCodeB',b>=8);show('kvPC',b>=8);show('kvEx',b>=9);show('kvRunR',b>=10);
+    show('kvOut',b>=10);show('kvO2',b>=11);
+    cap('kvEx',b>=11?'hlt: the guest stops<small>a second VM exit</small>':'store to 0x10000: no memory there<small>the CPU leaves the guest: a VM exit</small>');
+    cap('kvRunR',b>=11?'exit: HLT':'exit: MMIO');
     ALL.forEach(id=>cls(id,'lit',(LIT[k]||[]).includes(id)));cap('kvCap',CAP[k]);
-    clearF('kv');if(b===9)flowDots('kv',$('#kvSvg'),[{d:$('#kvUp').getAttribute('d'),dur:900,color:'#e8bd62',r:9}]);},leave(){clearF('kv');}};})();
+    clearF('kv');if(b===10||b===11)flowDots('kv',$('#kvSvg'),[{d:$('#kvUp').getAttribute('d'),dur:900,color:'#e8bd62',r:9}]);},leave(){clearF('kv');}};})();
 
 /* ---------- 19. webcam: V4L2 ioctls and a ring of 4 mmap'ed buffers (snapshot.c, source lecture) ---------- */
 const Cam=(()=>{const R=[[],[0,1],[2,3,4],[5,6],[7,8,9,10],[11],[12],[13],[14],[]];
@@ -1360,7 +1366,7 @@ const CFG={
   ioctl:{builds:6,step(b){Ioctl.step(b);}},
   tty:{builds:5,step(b){Tty.step(b);}},
   wsl:{builds:4,step(b){Wsl.step(b);},leave(){Wsl.leave();}},
-  kvm:{builds:11,step(b){Kvm.step(b);},leave(){Kvm.leave();}},
+  kvm:{builds:13,step(b){Kvm.step(b);},leave(){Kvm.leave();}},
   cam:{builds:10,step(b){Cam.step(b);},leave(){Cam.leave();}},
   gpu:{builds:6,step(b){Gpu.step(b);},leave(){Gpu.leave();}},
   nvidia:{builds:4},
