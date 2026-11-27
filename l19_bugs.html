@@ -782,8 +782,8 @@ sum = 2000020</pre></div>
     <div class="yr" data-b="0" style="--d:.5s;left:120px;top:230px;font-size:96px">1985-1987</div>
     <div class="lb" data-b="0" style="--d:.7s;left:120px;top:380px;font-size:40px">at least <span class="gold">6</span> massive overdoses</div>
     <div class="lb" data-b="0" style="--d:.9s;left:120px;top:450px;font-size:40px"><span class="gold">3</span> patients died of them</div>
-    <div class="lb" data-b="0" style="--d:1.1s;left:120px;top:540px;font-size:30px;color:#dfe5ee">cause: races in the control software</div>
-    <div class="lb" data-b="0" style="--d:1.2s;left:120px;top:590px;font-size:30px;color:#dfe5ee">no hardware interlock to stop the beam</div>
+    <div class="lb" data-b="0" style="--d:1.1s;left:120px;top:540px;font-size:30px;color:#dfe5ee">Tyler and Yakima: races in the control software</div>
+    <div class="lb" data-b="0" style="--d:1.2s;left:120px;top:590px;font-size:30px;color:#dfe5ee">key safety checks depended on software</div>
     <div class="lb g tk" data-b="1">A race is not only a wrong number: here it killed patients</div>
     <div class="cred" data-b="0" style="--d:.8s">facts: N. Leveson and C. Turner, "An Investigation of the Therac-25 Accidents", IEEE Computer 26(7), 1993; Wikipedia "Therac-25" (checked 2026-11-26)</div>
   </section>
@@ -795,8 +795,8 @@ sum = 2000020</pre></div>
       <div class="r">setup task starts the magnets: ~8 s</div>
       <div class="r">operator edits X → E (electron)</div>
       <div class="r">setup task misses the edit</div>
-      <div class="r">"Malfunction 54"; operator presses P</div>
-      <div class="r">high current, target not in place</div>
+      <div class="r">first exposure, then “Malfunction 54”</div>
+      <div class="r">P resumes treatment; the fault repeats</div>
     </div>
     <div class="code3" data-b="0" style="--d:.3s;left:120px;top:560px;width:800px;font-size:24px"><div class="ct">safety rule</div>
       <div class="r">assert mode in [Electron, XRay]</div>
@@ -1211,20 +1211,20 @@ const TBug=(()=>{const CX=[1080,1380,1680],TOP=280;
   function build(){once('tb',()=>{$('#tbSvg').innerHTML=CX.map(col).join('')+`<text x="${CX[0]+40}" y="${TOP+240}" style="font-family:var(--sans);font-size:20px;fill:#dfe5ee">target out</text><text x="${CX[1]+75}" y="${TOP+254}" style="font-family:var(--sans);font-size:20px;fill:#dfe5ee">target in</text>`;});}
   return {step(b){build();setRows('#tbCode .r',[{},{0:'cur'},{1:'cur',2:'cb'},{3:'bad'},{4:'bad'},{5:'bad'}][b]);
     const f=(i,c)=>{const r=$('#tbF'+i);r.setAttribute('stroke',c||'#2b3a4d');r.setAttribute('stroke-width',c?4:2);};
-    f(0,b===2||b===3?'#e8bd62':0);f(1,b===1?'#e8bd62':0);f(2,b>=5?'#ff6b6b':0);$('#tbC2').style.opacity=b>=5||b===0?1:0;show('tbM54',b>=4);}};})();
+    f(0,b===2||b===3?'#e8bd62':0);f(1,b===1?'#e8bd62':0);f(2,b>=4?'#ff6b6b':0);$('#tbC2').style.opacity=b>=4||b===0?1:0;show('tbM54',b>=4);}};})();
 
 /* ---------- 20. Therac-20 interlock, Class3 wraps, independent hardware ---------- */
 const TFix=(()=>{const bx=(id,x,y,t,s,c)=>`<div class="pipe ${c||''}" id="${id}" style="left:${x}px;top:${y}px;width:280px;height:110px;padding:14px 16px"><b style="font-size:26px">${t}</b><span style="margin-top:6px;font-size:21px">${s}</span></div>`;
   function build(){once('tf',()=>{let s=`<div class="lb" style="left:120px;top:262px;font-size:32px">Therac-20</div><div class="lb" style="left:120px;top:432px;font-size:32px">Therac-25</div>`;
     s+=bx('tfS1',420,230,'software','sends the command')+bx('tfI1',840,230,'interlock','hardware: stops it','g')+bx('tfB1',1260,230,'beam','');
-    s+=bx('tfS2',420,400,'software','sends the command')+`<div class="fade" id="tfI2w" style="opacity:0">${bx('tfI2',840,400,'independent','hardware: stops on overdose','g')}</div>`+bx('tfB2',1260,400,'beam','');
+    s+=bx('tfS2',420,400,'software','sends the command')+`<div class="fade" id="tfI2w" style="opacity:0">${bx('tfI2',840,400,'independent','hardware: checks beam safety','g')}</div>`+bx('tfB2',1260,400,'beam','');
     s+=svgH(`<path d="M700 285 H835" class="wa t" marker-end="url(#mkT)"/><path d="M1120 285 H1255" class="wa t" marker-end="url(#mkT)"/><path id="tfDir" d="M700 455 H1255" class="wa w" marker-end="url(#mkR)"/><path id="tfI2a" d="M1120 455 H1255" class="wa t" opacity="0" marker-end="url(#mkT)"/>`);
     s+=`<div id="tfCnt" class="fade" style="opacity:0"><div class="lb" style="left:120px;top:610px;font-size:28px;color:#dfe5ee">Class3, one byte: +1 every pass; 0 means "skip the check"</div>`+
       ['254','255','0'].map((v,i)=>`<div class="keyc" style="left:${420+i*170}px;top:670px;width:130px;${i===2?'background:var(--red);box-shadow:0 0 22px rgba(255,107,107,.6)':''}">${v}</div>`).join('')+
       `<div class="lb" style="left:950px;top:680px;font-size:28px;color:var(--red)">operator presses set now: check skipped</div></div>`;
     $('#tfPic').innerHTML=s;});}
   return {step(b){build();show('tfCnt',b>=1);show('tfI2w',b>=2);const d=$('#tfDir');d.setAttribute('d',b>=2?'M700 455 H835':'M700 455 H1255');d.setAttribute('class',b>=2?'wa t':'wa w');d.setAttribute('marker-end',b>=2?'url(#mkT)':'url(#mkR)');op('tfI2a',b>=2);
-    cap('tfCap',['','Yakima, 1987: a counter used as a flag wraps to zero','the final fix: a check that does not trust the software',''][b]);}};})();
+    cap('tfCap',['','Yakima, 1987: a counter used as a flag wraps to zero','added protection: independent hardware checks',''][b]);}};})();
 
 /* ---------- 21. Lu et al., ASPLOS 2008: 105 bugs ---------- */
 const Study=(()=>{const A=[['MySQL',14,9],['Apache',13,4],['Mozilla',41,16],['OpenOffice',6,2]],U=20,X0=420,Y=i=>250+i*100;

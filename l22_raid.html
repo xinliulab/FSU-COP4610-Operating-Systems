@@ -751,10 +751,10 @@ Drop superfluous clusters? <span class="gd">yes</span>
       <div class="h">how the program saves</div><div class="h">after a crash at the wrong moment</div>
       <div class="c w sv0">open("a.txt", "w"), then write</div><div class="c bad sv0">a.txt is empty: "w" truncated it first</div>
       <div class="c w sv1">write a.txt.tmp, rename it, no fsync</div><div class="c bad sv1">a.txt can be empty: the rename reached the disk before the data</div>
-      <div class="c w sv2">write, fsync, rename (save above)</div><div class="c ok sv2">the old a.txt or the new one, never a mix</div>
+      <div class="c w sv2">write, fsync, rename, fsync directory</div><div class="c ok sv2">the old a.txt or the new one, never a mix</div>
     </div>
     <div class="lb" data-b="3" style="left:120px;top:775px;font-size:26px">OSDI 2014: 60 crash vulnerabilities in 11 widely used systems<small>databases, key-value stores, version control, virtualization software</small></div>
-    <div class="lb g tk" data-b="4">Write a temporary file, fsync it, then rename: the rename is the atomic step</div>
+    <div class="lb g tk" data-b="4">Rename replaces the file atomically. Sync the directory to persist it.</div>
     <div class="cred" data-b="0" style="--d:.8s">save.py, this lecture's code, run on this laptop · T. S. Pillai et al., "All File Systems Are Not Created Equal: On the Complexity of Crafting Crash-Consistent Applications", OSDI 2014 · story after Yanyan Jiang's lecture 26</div>
   </section>
   <section class="scene" data-id="durable" data-title="Durability costs a wait" data-chapter="05 · Apps">
