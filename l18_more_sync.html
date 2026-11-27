@@ -538,8 +538,8 @@ svg.ov{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
       <div style="color:#fff;font-family:var(--sans)">Linux kernel</div><div>down</div><div>up</div>
       <div style="color:#fff;font-family:var(--sans)">Java</div><div>acquire</div><div>release</div>
     </div>
-    <div class="lb g tk" data-b="2">Sixty years later, every OS and language still ships these two calls</div>
-    <div class="cred" data-b="0" style="--d:.8s">Photo: Hamilton Richards, CC BY-SA 3.0 · signals: Alan Hughes (geograph.org.uk), CC BY-SA 2.0 · facts: Wikipedia, "Semaphore (programming)" and "THE multiprogramming system" (CACM 11(5), 1968), checked 2026-11-26</div>
+    <div class="lb g tk" data-b="2">Sixty years later, the same two operations still go by many names</div>
+    <div class="cred" data-b="0" style="--d:.8s">Photo: Hamilton Richards, CC BY-SA 3.0 · signals: Alan Hughes (geograph.org.uk), CC BY-SA 2.0 · history: Dijkstra, EWD 35 (c. 1962–63) and EWD 196 (CACM 11(5), 1968)</div>
   </section>
   <section class="scene" data-id="gate" data-title="A semaphore guards only the gate" data-chapter="02 · Invent">
     <div class="route" data-sub="only the gate" data-t="2"></div>
@@ -915,7 +915,7 @@ svg.ov{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
     <div class="lb fade" id="nwFix" style="left:1040px;top:620px;font-size:28px;color:var(--teal);opacity:0">new rule: change one line<small style="color:#dfe5ee">the loop and the broadcast stay the same</small></div>
     <div class="lb fade" id="nwQ" style="left:120px;top:800px;font-size:28px;color:#dfe5ee;font-weight:400;opacity:0"><i>"Don't generalize; generalizations are generally wrong."</i> · Butler Lampson, quoted in OSTEP</div>
     <div class="lb g tk" data-b="2">Systems want code that is right for a reason you can read in it</div>
-    <div class="cred" data-b="0" style="--d:.8s">After the source lecture ("No! This is not a success"); the three-fork rule is a made-up change for illustration · quote: OSTEP, Semaphores chapter (tip "Be careful with generalization"), citing Lampson, "Hints for Computer System Design", 1983</div>
+    <div class="cred" data-b="0" style="--d:.8s">After the source lecture ("No! This is not a success"); the three-fork rule is a made-up change for illustration · quote: OSTEP, Semaphores chapter (tip "Be Careful When Generalizing"), citing Lampson, "Hints for Computer System Design", 1983</div>
   </section>
   <section class="scene" data-id="close" data-title="Harder: add close() and open()" data-chapter="07 · Harder">
     <div class="route" data-sub="close and open" data-t="7"></div>
@@ -1010,7 +1010,7 @@ svg.ov{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
 200000 round trips in 1.482 s: <span class="gd">7.41 microseconds</span> per round trip
 200000 round trips in 1.535 s: <span class="gd">7.68 microseconds</span> per round trip</pre></div>
     <div class="pipe" data-b="1" style="left:1080px;top:220px;width:720px;height:230px;text-align:left;padding:24px 30px"><b style="font-family:var(--sans);font-size:32px;font-weight:600;color:var(--gold)">Measure first</b><span style="font-size:27px;color:#fff;margin-top:16px"><i>"Premature optimization is the root of all evil."</i></span><span style="font-size:22px">Donald Knuth, "Structured Programming with go to Statements", Computing Surveys, 1974</span></div>
-    <div class="pipe" data-b="2" style="left:1080px;top:490px;width:720px;height:270px;text-align:left;padding:24px 30px;border-color:var(--teal-d)"><b style="font-family:var(--sans);font-size:32px;font-weight:600;color:var(--teal)">If one is not enough, use many</b><span style="font-size:26px;color:#fff;margin-top:16px">AWS Physalia (NSDI 2020): "Millions of Tiny Databases"</span><span style="font-size:22px">EBS keeps its configuration in many small cells instead of one big store, so one failure hurts only a few volumes</span></div>
+    <div class="pipe" data-b="2" style="left:1080px;top:490px;width:720px;height:270px;text-align:left;padding:24px 30px;border-color:var(--teal-d)"><b style="font-family:var(--sans);font-size:32px;font-weight:600;color:var(--teal)">If one is not enough, use many</b><span style="font-size:26px;color:#fff;margin-top:16px">AWS Physalia (NSDI 2020): "Millions of Tiny Databases"</span><span style="font-size:22px">EBS keeps its configuration in many small cells instead of one big store, to limit how many volumes a failure can affect</span></div>
     <div class="lb g tk" data-b="3">One waiter costs microseconds; when it is not enough, split the table</div>
     <div class="cred" data-b="0" style="--d:.8s">pingpong.c, written for this lecture, run on this laptop (source/code/pingpong.out) · Knuth, ACM Computing Surveys 6(4), 1974 · Brooker, Chen, Ping, "Millions of Tiny Databases", USENIX NSDI 2020</div>
   </section>

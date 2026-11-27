@@ -1056,13 +1056,13 @@ frame rate    <b>60 per second</b>
   <section class="scene" data-id="pnp" data-title="1998: Plug and Play crashes on stage" data-chapter="06 · Bus">
     <div class="route" data-sub="1998 demo" data-t="6" data-br="1"></div>
     <div class="ttl" data-b="0"><span class="ey">Bus</span>1998: Plug and Play crashes on stage</div>
-    <div class="lb" data-b="0" style="--d:.2s;left:120px;top:200px;font-size:30px">April 20, 1998 · COMDEX, Chicago · a live demo of Windows 98<small>an assistant plugs a USB scanner into the PC on stage</small></div>
+    <div class="lb" data-b="0" style="--d:.2s;left:120px;top:200px;font-size:30px">April 20, 1998 · COMDEX, Chicago · a live demo of Windows 98<small>Microsoft's Chris Capossela plugs a USB scanner into the PC</small></div>
     <svg class="abs dg" id="ppSvg" style="left:0;top:0" width="1920" height="1080" viewBox="0 0 1920 1080"><g id="ppA"></g></svg>
     <div id="ppG"></div>
-    <div class="abs" id="ppBlue" style="left:1240px;top:560px;width:560px;height:290px;border-radius:12px;background:#0d2c9e;border:2px solid #4d6fff;box-shadow:0 0 40px rgba(77,111,255,.5);opacity:0;transition:opacity .5s"><div class="lb" style="left:30px;top:24px;font-size:30px">blue screen</div><div class="lb" style="left:30px;top:84px;font-size:24px;font-weight:400;white-space:normal;width:500px;line-height:1.35">The whole system stopped: the bug ran inside the kernel.</div></div>
+    <div class="abs" id="ppBlue" style="left:1240px;top:560px;width:560px;height:290px;border-radius:12px;background:#0d2c9e;border:2px solid #4d6fff;box-shadow:0 0 40px rgba(77,111,255,.5);opacity:0;transition:opacity .5s"><div class="lb" style="left:30px;top:24px;font-size:30px">blue screen</div><div class="lb" style="left:30px;top:84px;font-size:24px;font-weight:400;white-space:normal;width:500px;line-height:1.35">The whole system stopped when the USB stack hit an error.</div></div>
     <div class="quote" id="ppQ" style="left:120px;top:690px;width:1060px;opacity:0;transition:opacity .5s">"That must be why we're not shipping Windows 98 yet."<small>Bill Gates, on stage, a moment later</small></div>
-    <div class="lb g tk" data-b="4">Plug and play loads new code into the kernel, and a bug stops it all</div>
-    <div class="cred" data-b="0" style="--d:.8s">Event: Windows 98 demonstration at COMDEX Spring, Chicago, 20 April 1998 (widely reported, e.g., CNN; video on YouTube "Windows 98 crash on live TV"); steps after the source lecture's explanation</div>
+    <div class="lb g tk" data-b="4">A bug during device setup can stop the whole system</div>
+    <div class="cred" data-b="0" style="--d:.8s">Event: Windows 98 demonstration at Spring COMDEX, Chicago, 20 April 1998 (Business Standard, 22 April 1998; The Register, 20 April 2018) · cause: R. Chen, The Old New Thing, 21 May 2024 · steps after the source lecture's explanation</div>
   </section>
   <section class="scene" data-id="pcie" data-title="PCIe: fast lanes straight to the CPU" data-chapter="06 · Bus">
     <div class="route" data-sub="PCIe" data-t="6"></div>
@@ -1081,10 +1081,10 @@ frame rate    <b>60 per second</b>
     <div data-b="1">
       <div class="chip3 t" style="left:120px;top:560px;font-size:23px">DMA built in</div>
       <div class="chip3 t" style="left:330px;top:560px;font-size:23px">interrupts sent as messages (MSI)</div>
-      <div class="chip3 t" style="left:820px;top:560px;font-size:23px">75 W from the slot</div>
-      <div class="lb t" style="left:1010px;top:494px;font-size:24px">PCIe 6.0 x16: 128 GB/s</div>
+      <div class="chip3 t" style="left:820px;top:560px;font-size:23px">up to 75 W from an x16 slot</div>
+      <div class="lb t" style="left:1010px;top:494px;font-size:24px">PCIe 6.0 x16: 128 GB/s raw<small>per direction, before overhead</small></div>
     </div>
-    <div class="lb" data-b="2" style="left:120px;top:625px;font-size:22px;color:#c3ccd8">GT/s per lane, by version and year (PCI-SIG)</div>
+    <div class="lb" data-b="2" style="left:120px;top:625px;font-size:22px;color:#c3ccd8">Raw GT/s per lane · PCI-SIG specification releases</div>
     <div id="pxChart" data-b="2"></div>
     <div class="tw" data-b="3" style="left:1370px;top:200px;width:430px;height:470px"><div class="bar"><i></i><i></i><i></i><span>this laptop</span></div><pre style="font-size:21px;line-height:1.5;padding:14px 18px"><span class="p">$ </span><span class="w">system_profiler</span>
 <span class="w">    SPThunderboltDataType</span>
@@ -1096,8 +1096,8 @@ frame rate    <b>60 per second</b>
 <span class="w">  +-o mapper-apcie0-wlan</span>
 <span class="w">  +-o mapper-apcie0-bt</span></pre></div>
     <div class="lb" data-b="3" style="--d:.3s;left:1370px;top:690px;font-size:24px">Wi-Fi and Bluetooth sit on PCIe</div>
-    <div class="lb g tk" data-b="4">Every fast device, GPU, NIC, SSD, gets its own lanes to the CPU</div>
-    <div class="cred" data-b="0" style="--d:.8s">Photo: TheStriker, CC BY-SA 4.0 · lane speeds: PCI-SIG specifications 1.0 (2003) to 7.0 (2025) · DMA, MSI, 75 W, 128 GB/s after the source lecture · this laptop: profiler.out, devtree.out (lines shortened)</div>
+    <div class="lb g tk" data-b="4">Each PCIe link has its own lanes, from GPUs to SSDs</div>
+    <div class="cred" data-b="0" style="--d:.8s">Photo: TheStriker, CC BY-SA 4.0 · lane speeds: PCI-SIG specifications 1.0a (2003) to 7.0 (2025) · 75 W slot power: PCIe CEM specification · PCIe 6.0 x16: 256 GB/s raw both ways (PCI-SIG) · this laptop: profiler.out, devtree.out (lines shortened)</div>
   </section>
   <section class="scene" data-id="cxl" data-title="CXL: memory across the bus" data-chapter="06 · Bus">
     <div class="route" data-sub="CXL" data-t="6"></div>
@@ -1115,7 +1115,7 @@ frame rate    <b>60 per second</b>
     <div id="cxSticks" style="opacity:0;transition:opacity .5s"></div>
     <div class="lb g" id="cxFar" style="left:700px;top:600px;font-size:26px;opacity:0;transition:opacity .4s">far memory: slower than local DRAM<small>but huge, and shared by many servers</small></div>
     <div class="lb g tk" data-b="4">With CXL, memory itself becomes a device on the bus</div>
-    <div class="cred" data-b="0" style="--d:.8s">After the source lecture (CXL.io, CXL.cache, CXL.memory; CXL 3.0 lets devices share memory; disaggregated data centers) · CXL Consortium: 1.0 in 2019, 2.0 in 2020 (switching, pooling), 3.0 in 2022 (sharing)</div>
+    <div class="cred" data-b="0" style="--d:.8s">After the source lecture (CXL.io, CXL.cache, CXL.memory; CXL 3.0 lets devices share memory; disaggregated data centers) · CXL Consortium: 1.0 in March 2019, 2.0 in November 2020 (switching, pooling), 3.0 in August 2022 (sharing)</div>
   </section>
   <section class="scene" data-id="end" data-title="Takeaways" data-chapter="Closing">
     <div class="ttl" data-b="0"><span class="ey">Takeaways</span>A device, seen from the CPU</div>
@@ -1455,7 +1455,7 @@ const Pnp=(()=>{const S=[['1 · plug in the scanner',120,330,1],['2 · the bus r
     A.forEach((a,i)=>{const e=$('#ppa'+i);e.style.opacity=a[1]<=k?1:0;});show('ppBlue',k>=3);show('ppQ',k>=3);}};})();
 
 /* ---------- 20. PCIe: lane speed by version (PCI-SIG) ---------- */
-const Pcie=(()=>{const D=[['1.0',2003,2.5],['2.0',2007,5],['3.0',2010,8],['4.0',2017,16],['5.0',2019,32],['6.0',2022,64],['7.0',2025,128]],X0=140,SL=165,BASE=830,H=140;
+const Pcie=(()=>{const D=[['1.0a',2003,2.5],['2.0',2007,5],['3.0',2010,8],['4.0',2017,16],['5.0',2019,32],['6.0',2022,64],['7.0',2025,128]],X0=140,SL=165,BASE=830,H=140;
   function build(){once('px',()=>{let s='';D.forEach((d,i)=>{const x=X0+i*SL;s+=`<div class="vbar" id="pxb${i}" style="left:${x}px;bottom:${1080-BASE}px;width:100px;height:0;background:${i===6?'var(--gold)':'var(--teal)'}"></div>`+
       `<div class="tick" id="pxv${i}" style="left:${x+50}px;top:${BASE-30}px;font-size:22px;color:#fff;opacity:0;transition:top .7s var(--ease),opacity .4s">${d[2]}</div>`+
       `<div class="tick" style="left:${x+50}px;top:${BASE+8}px;font-size:20px;color:#c3ccd8">${d[0]} · ${d[1]}</div>`;});
