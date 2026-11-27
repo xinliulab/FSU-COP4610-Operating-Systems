@@ -1,7 +1,7 @@
 # FSU COP4610 — Operating Systems (Course Repository)
 
 <p align="center">
-  <a href="https://codespaces.new/FSU-COP4610-F25/in-class-code?ref=main"
+  <a href="https://codespaces.new/FSU-COP4610-S27/in-class-code?ref=main"
      style="
        display:inline-block;
        padding:20px 32px;
